@@ -1,46 +1,52 @@
-import './App.css'
+import './App.css';
+import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom'
-import logoSM from './assets/logoSM.png';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import Home from './components/Home';
 import CreateAccount from './components/CreateAccount';
 import RecoverAccount from './components/RecoverAccount';
+import ViewWallet from './components/ViewWallet';
 
-
-function App() {
-  const [selectedChain, setSelectedChain] = useState("0x1")
+const App: React.FC = () => {
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
 
   return (
     <div className="App">
-      <header>
-        <img src={logoSM} className="h-[50px] ml-3" alt="logoSM" />
-        <Select 
-        onValueChange={(val)=>setSelectedChain(val)} 
-        value={selectedChain}>
-          <SelectTrigger className="w-32 mr-3 bg-blackest border-none">
-            <SelectValue placeholder="Ethereum"/>
-          </SelectTrigger>
-          <SelectContent className="bg-blackest text-offwhite border-blacker">
-            <SelectItem value="0x1">Ethereum</SelectItem>
-            <SelectItem value="0x89">Polygon</SelectItem>
-            <SelectItem value="0xa86a">Avalanche</SelectItem>
-          </SelectContent>
-        </Select>
-      </header>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/create" element={<CreateAccount />} />
-        <Route path="/recover" element={<RecoverAccount />} />
-      </Routes>
+      {wallet && seedPhrase ? (
+        <Routes>
+          <Route
+            path="/yourwallet"
+            element={
+              <ViewWallet 
+              wallet={wallet}
+              //selectedChain={selectedChain}
+              />
+            }
+          />
+        </Routes>
+      ) : (
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/recover"
+            element={
+              <RecoverAccount
+              />
+            }
+          />
+          <Route
+            path="/create"
+            element={
+              <CreateAccount
+                setSeedPhrase={setSeedPhrase}
+                setWallet={setWallet}
+              />
+            }
+          />
+        </Routes>
+      )}
     </div>
-  )
-};
+  );
+}
 
-export default App
+export default App;
