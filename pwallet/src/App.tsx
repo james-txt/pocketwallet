@@ -19,6 +19,7 @@ const App: React.FC = () => {
             element={
               <ViewWallet 
               wallet={wallet}
+              seedPhrase={seedPhrase}
               //selectedChain={selectedChain}
               />
             }
