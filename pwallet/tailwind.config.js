@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+module.exports = { // eslint-disable-line
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -18,7 +18,8 @@ module.exports = {
     },
     extend: {
       colors: {
-        char:"#313131",
+        lightgrey: "#616161",
+        char:"#414141",
         blackest: "#121212",
         blacker: "#242424",
         sky: "#4EA8DE",
@@ -82,5 +83,5 @@ module.exports = {
       titillium: ["Titillium Web", "sans-serif"]
     }
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")], // eslint-disable-line
 }

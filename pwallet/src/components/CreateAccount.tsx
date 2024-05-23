@@ -2,7 +2,6 @@ import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { XButton } from "@/components/ui/xbutton";
 import { useState } from "react";
 import { Wallet } from "ethers";
 import { useNavigate } from "react-router-dom";
@@ -32,9 +31,8 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
   }
 
   return (
-    <div className="content px-4 my-3">
-      <XButton />
-      <Alert variant="destructive">
+    <div className="content px-4">
+      <Alert className="mt-4"variant="destructive">
         <ExclamationTriangleIcon className="h-6 w-6 mb-2" />
         <AlertTitle>WARNING</AlertTitle>
         <AlertDescription>
@@ -55,7 +53,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
         ))}
       </Card>
       <Button
-        className="mt-6 mb-5 bg-amber text-blackest w-8/12"
+        className="mt-6 bg-amber text-blackest w-8/12"
         onClick={setWalletAndMnemonic}
       >
         Open Your New Wallet!

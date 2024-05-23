@@ -1,7 +1,6 @@
 import logo from '../assets/logo.png';
 import { Button } from "@/components/ui/button"
 import { useNavigate } from 'react-router-dom';
-import Header from './Header';
 
 
 function Home() {
@@ -9,10 +8,7 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <Header />
-      <div className="content">
-        
+       <div className="content">
         <h1 className="font-semibold text-5xl tracking-tight mb-8 mt-4">pocket</h1>
         <img src={logo} loading="lazy" className="ml-5 w-6/12 grayscale-[80%]" alt="logo" />
         <Button 
@@ -31,7 +27,6 @@ function Home() {
         <p className="text-sm text-center">
             &copy; 2024 pocket wallet™</p>
       </div>
-    </div>
   )
 }
 
