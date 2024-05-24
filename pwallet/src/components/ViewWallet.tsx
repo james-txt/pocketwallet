@@ -11,11 +11,10 @@ import {
 
 interface ViewWalletProps {
   wallet: string | null;
-  seedPhrase: string | null;
 }
 
 
-const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, seedPhrase }) => {
+const ViewWallet: React.FC<ViewWalletProps> = ({ wallet }) => {
   
   const [tooltipText, setTooltipText] = useState('Copy to clipboard');
   const [copied, setCopied] = useState(false);
@@ -54,7 +53,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, seedPhrase }) => {
                 )}
               </Button>
             </TooltipTrigger>
-            <TooltipContent align="end" side="right" sideOffset={-22} alignOffset={-20} className="bg-char border border-none shadow-sm shadow-blackest">
+            <TooltipContent align="end" side="right" sideOffset={-22} alignOffset={-20} className="bg-char border-none shadow-sm shadow-blackest">
               <p>{tooltipText}</p>
             </TooltipContent>
           </Tooltip>
@@ -62,7 +61,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, seedPhrase }) => {
 
         <hr className=" border-lightgrey mx-auto w-10/12" />
 
-        <p>{seedPhrase}</p>
+        <p></p>
       </div>
   );
 };

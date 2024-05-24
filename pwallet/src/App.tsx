@@ -23,20 +23,20 @@ import {
 
 
 const App: React.FC = () => {
-  const [wallet, setLocalWallet] = useState<string | null>(null);
-  const [seedPhrase, setLocalSeedPhrase] = useState<string | null>(null);
-  
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState("0x1");
 
+  const navigate = useNavigate();
+  const location = useLocation();
+ 
   const lockWallet = () => {
-    setLocalSeedPhrase(null);
-    setLocalWallet(null);
+    setSeedPhrase(null);
+    setWallet(null);
     navigate("/");
   };
 
-  const renderHeader = () => {
+  const menuHeader = () => {
     const currentPath = location.pathname;
 
     if (currentPath === "/") {
@@ -80,9 +80,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="App z-0">
+    <div className="App">
       <header>
-        {renderHeader()}
+        {menuHeader()}
         <Select
           onValueChange={(val) => setSelectedChain(val)}
           value={selectedChain}
@@ -99,13 +99,21 @@ const App: React.FC = () => {
       </header>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/recover" element={<RecoverAccount />} />
+        <Route
+          path="/recover"
+          element={
+            <RecoverAccount
+              setSeedPhrase={setSeedPhrase}
+              setWallet={setWallet}
+            />
+          }
+        />
         <Route
           path="/create"
           element={
             <CreateAccount
-              setSeedPhrase={setLocalSeedPhrase}
-              setWallet={setLocalWallet}
+              setSeedPhrase={setSeedPhrase}
+              setWallet={setWallet}
             />
           }
         />
@@ -113,9 +121,8 @@ const App: React.FC = () => {
           <Route
             path="/yourwallet"
             element={
-              <ViewWallet 
+              <ViewWallet
                 wallet={wallet}
-                seedPhrase={seedPhrase}
                 // selectedChain={selectedChain}
               />
             }

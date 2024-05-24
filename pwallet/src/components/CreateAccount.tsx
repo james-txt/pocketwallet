@@ -32,28 +32,33 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
 
   return (
     <div className="content px-4">
-      <Alert className="mt-4"variant="destructive">
+      <Alert className="mt-4" variant="destructive">
         <ExclamationTriangleIcon className="h-6 w-6 mb-2" />
         <AlertTitle>WARNING</AlertTitle>
         <AlertDescription>
-          Once you generate a seed phrase, you will need to write it down and keep it safe.
+          Once you generate a seed phrase, you will need to write it down and
+          keep it safe.
           <br />
           If you lose your seed phrase, you will lose access to your funds.
         </AlertDescription>
       </Alert>
-      <Button 
-        className="mt-6 mb-5 bg-sky text-blackest w-8/12"
+      <Button
+        className="my-7 bg-sky text-blackest w-10/12"
         onClick={generateWallet}
       >
         Generate Seed Phrase
       </Button>
       <Card className="seedPhraseContainer bg-black text-offwhite">
-        {newSeedPhrase && newSeedPhrase.split(' ').map((word, index) => (
-          <span className="pt-1" key={index}>{word} </span>
-        ))}
+        {newSeedPhrase &&
+          newSeedPhrase.split(" ").map((word, index, wordsArray) => (
+            <span className="pt-1" key={index}>
+              {word}
+              {index < wordsArray.length - 1 && "\u00A0"}
+            </span>
+          ))}
       </Card>
       <Button
-        className="mt-6 bg-amber text-blackest w-8/12"
+        className="my-7 bg-amber text-blackest w-10/12"
         onClick={setWalletAndMnemonic}
       >
         Open Your New Wallet!
