@@ -7,19 +7,8 @@ import RecoverAccount from './components/RecoverAccount';
 import ViewWallet from './components/ViewWallet';
 import logoSM from "./assets/logoSM.png";
 import { LockClosedIcon, Cross1Icon } from "@radix-ui/react-icons";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 
 
 const App: React.FC = () => {
