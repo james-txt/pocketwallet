@@ -1,10 +1,10 @@
+import { useState } from "react";
+import { Wallet } from "ethers";
+import { useNavigate } from "react-router-dom";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
-import { Wallet } from "ethers";
-import { useNavigate } from "react-router-dom";
 
 interface CreateAccountProps {
   setSeedPhrase: React.Dispatch<React.SetStateAction<string | null>>;

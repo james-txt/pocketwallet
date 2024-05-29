@@ -78,10 +78,28 @@ module.exports = { // eslint-disable-line
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      scrollbarHide: {
+        '-ms-overflow-style': 'none',
+        'scrollbar-width': 'none',
+      },
     },
     fontFamily: {
       titillium: ["Titillium Web", "sans-serif"]
     }
   },
-  plugins: [require("tailwindcss-animate")], // eslint-disable-line
+  plugins: [
+    require("tailwindcss-animate"), // eslint-disable-line
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.scrollbar-hide': {
+          'scrollbar-width': 'none',
+          '-ms-overflow-style': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 }
