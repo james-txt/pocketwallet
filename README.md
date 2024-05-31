@@ -3,7 +3,7 @@
 Non-custodial cryptocurrency as web extension for your browser.
 Providing ability to manage tokens, NFTs and to make transfers.
 
-![pwalletpreview](docs\pwalletprev.png?raw=true "main")
+![pwalletpreview](docs/pwalletprev.png?raw=true "main")
 
 <hr />
 
