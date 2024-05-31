@@ -11,15 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 
 
-
 const App: React.FC = () => {
   const [tooltipAddressText, setTooltipAddressText] = useState("Copy to clipboard");
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
   const [wallet, setWallet] = useState<string | null>(null);
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
-  const [selectedChain, setSelectedChain] = useState("0x1");
-
+  const [selectedChain, setSelectedChain] = useState('0x1');
+  
   const navigate = useNavigate();
   const location = useLocation();
  
@@ -131,12 +130,12 @@ const App: React.FC = () => {
           value={selectedChain}
         >
           <SelectTrigger className="w-16 mr-3 rounded-full bg-blackest border-none">
-            <SelectValue placeholder="Ethereum" />
+            <SelectValue/>
           </SelectTrigger>
           <SelectContent className="w-16 min-w-0 rounded-md bg-blackest text-offwhite border-blacker">
-            <SelectItem value="0x1">Eth</SelectItem>
-            <SelectItem value="0x89">Poly</SelectItem>
-            <SelectItem value="0xa86a">Ava</SelectItem>
+            <SelectItem value="0x1" textValue="ETH">Eth</SelectItem>
+            <SelectItem value="0x89" textValue="MATIC">Poly</SelectItem>
+            <SelectItem value="0xa86a" textValue="AVAX">Ava</SelectItem>
           </SelectContent>
         </Select>
       </header>

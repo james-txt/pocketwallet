@@ -1,8 +1,19 @@
-# Project Title
+# pocket Wallet
 
-One Paragraph of project description goes here
+Non-custodial cryptocurrency as web extension for your browser.
+Providing ability to manage tokens, NFTs and to make transfers.
 
-## Getting Started
+![pwalletpreview](docs\pwalletprev.png?raw=true "main")
+
+<hr />
+
+## Install
+
+You can install pocket Wallet right now:
+
+[![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png)]
+
+## Quick Start
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
