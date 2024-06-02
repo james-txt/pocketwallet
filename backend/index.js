@@ -13,10 +13,11 @@ app.get('/getTokens', async (req, res) => {
   const { userAddress, chain } = req.query;
 
   try {
-    const tokens = await Moralis.EvmApi.token.getWalletTokenBalances({
+    const tokens = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
+      excludeSpam: true,
+      excludeUnverifiedContracts: true,
       chain: chain,
       address: userAddress,
-      
     });
 
     const nfts = await Moralis.EvmApi.nft.getWalletNFTs({
@@ -29,23 +30,29 @@ app.get('/getTokens', async (req, res) => {
       .filter(e => e?.media?.media_collection?.high?.url && !e.possible_spam && e?.media?.category !== 'video')
       .map(e => e.media.media_collection.high.url);
 
-    const balance = await Moralis.EvmApi.balance.getNativeBalance({
+    const networth = await Moralis.EvmApi.wallets.getWalletNetWorth({
+      excludeSpam: true,
+      excludeUnverifiedContracts: true,
       chain: chain,
       address: userAddress,
     });
 
-    const networth = await Moralis.EvmApi.wallets.getWalletNetWorth({
-      "excludeSpam": true,
-      "excludeUnverifiedContracts": true,
-      chain: chain,
-      address: userAddress,
+    const chains = networth.raw.chains.map(c => {
+      if (c.chain === 'eth') {
+        return {
+          ...c,
+          name: 'Ethereum',
+          symbol: 'ETH',
+        };
+      }
+      return c;
     });
 
     const jsonResponse = {
-      tokens: tokens.raw,
+      tokens: wallets.raw,
       nfts: myNfts,
-      balance: balance.raw.balance / 10 ** 18,
-      networth: networth,
+      total_networth_usd: networth.raw.total_networth_usd,
+      chains: chains,
     };
 
     res.status(200).json(jsonResponse);
@@ -63,4 +70,5 @@ Moralis.start({
   });
 });
 
-//http://localhost:3000/getTokens?userAddress=0x887E3DB0D16807730fA40619c70C4846a79cA854&chain=0x1
+// Test URL:
+// http://localhost:3000/getTokens?userAddress=0x887E3DB0D16807730fA40619c70C4846a79cA854&chain=0x1
