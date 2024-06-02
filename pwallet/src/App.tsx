@@ -1,15 +1,21 @@
+import React, { useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
 import Home from './components/Home';
 import CreateAccount from './components/CreateAccount';
 import RecoverAccount from './components/RecoverAccount';
 import ViewWallet from './components/ViewWallet';
 import logoSM from "./assets/logoSM.png";
+import arbLogo from "./assets/arb.png";
+import avaxLogo from "./assets/avax.png";
+import baseLogo from "./assets/base.png";
+import bnbLogo from "./assets/bnb.png";
+import ethLogo from "./assets/eth.png";
+import maticLogo from "./assets/matic.png";
+import opLogo from "./assets/op.png";
 import { Button } from './components/ui/button';
 import { CheckboxIcon, CopyIcon, LockClosedIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const App: React.FC = () => {
   const [tooltipAddressText, setTooltipAddressText] = useState("Copy to clipboard");
@@ -18,10 +24,9 @@ const App: React.FC = () => {
   const [wallet, setWallet] = useState<string | null>(null);
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState('0x1');
-  
   const navigate = useNavigate();
   const location = useLocation();
- 
+
   const lockWallet = () => {
     setSeedPhrase(null);
     setWallet(null);
@@ -130,12 +135,38 @@ const App: React.FC = () => {
           value={selectedChain}
         >
           <SelectTrigger className="w-16 mr-3 rounded-full bg-blackest border-none">
-            <SelectValue/>
+            <SelectValue />
           </SelectTrigger>
           <SelectContent className="w-16 min-w-0 rounded-md bg-blackest text-offwhite border-blacker">
-            <SelectItem value="0x1" textValue="ETH">Eth</SelectItem>
-            <SelectItem value="0x89" textValue="MATIC">Poly</SelectItem>
-            <SelectItem value="0xa86a" textValue="AVAX">Ava</SelectItem>
+            <SelectItem value="0x4268" textValue="ETHTEST">
+              EthTestnet
+            </SelectItem>
+            <SelectItem value="0x13882" textValue="POLYTEST">
+              PolyTestnet
+            </SelectItem>
+            <SelectItem value="0x1" textValue="ETH">
+              <div className="w-6 h-6 bg-offwhite rounded-full">
+                <img src={ethLogo} loading="lazy" alt="ethLogo" className="w-6 h-6 z-10" />
+              </div>
+            </SelectItem>
+            <SelectItem value="0x89" textValue="MATIC">
+              <img src={maticLogo} loading="lazy" alt="maticLogo" className="w-6 h-6" />
+            </SelectItem>
+            <SelectItem value="0xa86a" textValue="AVAX">
+              <img src={avaxLogo} loading="lazy" alt="avaxLogo" className="w-6 h-6" />
+            </SelectItem>
+            <SelectItem value="0x38" textValue="BNB">
+              <img src={bnbLogo} loading="lazy" alt="bnbLogo" className="w-6 h-6" />
+            </SelectItem>
+            <SelectItem value="0xa4b1" textValue="ARB">
+              <img src={arbLogo} loading="lazy" alt="arbLogo" className="w-6 h-6" />
+            </SelectItem>
+            <SelectItem value="0x2105" textValue="BASE">
+              <img src={baseLogo} loading="lazy" alt="baseLogo" className="w-6 h-6" />
+            </SelectItem>
+            <SelectItem value="0xa" textValue="OP">
+              <img src={opLogo} loading="lazy" alt="opLogo" className="w-6 h-6" />
+            </SelectItem>
           </SelectContent>
         </Select>
       </header>
@@ -163,10 +194,7 @@ const App: React.FC = () => {
           <Route
             path="/yourwallet"
             element={
-              <ViewWallet
-                wallet={wallet}
-                // selectedChain={selectedChain}
-              />
+              <ViewWallet wallet={wallet} selectedChain={selectedChain} />
             }
           />
         )}

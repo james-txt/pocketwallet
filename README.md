@@ -11,7 +11,7 @@ Providing ability to manage tokens, NFTs and to make transfers.
 
 You can install pocket Wallet right now:
 
-[![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png)]
+|![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png)|
 
 ## Quick Start
 

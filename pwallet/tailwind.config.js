@@ -88,6 +88,7 @@ module.exports = { // eslint-disable-line
     }
   },
   plugins: [
+    "prettier-plugin-tailwindcss",
     require("tailwindcss-animate"), // eslint-disable-line
     function ({ addUtilities }) {
       const newUtilities = {
