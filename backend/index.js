@@ -1,6 +1,8 @@
 require('dotenv').config({ path: 'secrets.env' });
 const express = require('express');
 const Moralis = require('moralis').default;
+const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 
 const app = express();
@@ -9,13 +11,26 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
+// Serve logos
+app.get('/logo', (req, res) => {
+  const { symbol } = req.query;
+  const imagePath = path.join(__dirname, 'cryptoicons', `${symbol.toLowerCase()}.png`);
+  try {
+    const image = fs.readFileSync(imagePath);
+    res.writeHead(200, { 'Content-Type': 'image/png' });
+    res.end(image, 'binary');
+  } catch (err) {
+    console.error(err);
+    res.status(404).send('Image not found');
+  }
+});
+
+// Fetch tokens and NFTs
 app.get('/getTokens', async (req, res) => {
   const { userAddress, chain } = req.query;
 
   try {
     const tokens = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
-      excludeSpam: true,
-      excludeUnverifiedContracts: true,
       chain: chain,
       address: userAddress,
     });
@@ -30,29 +45,9 @@ app.get('/getTokens', async (req, res) => {
       .filter(e => e?.media?.media_collection?.high?.url && !e.possible_spam && e?.media?.category !== 'video')
       .map(e => e.media.media_collection.high.url);
 
-    const networth = await Moralis.EvmApi.wallets.getWalletNetWorth({
-      excludeSpam: true,
-      excludeUnverifiedContracts: true,
-      chain: chain,
-      address: userAddress,
-    });
-
-    const chains = networth.raw.chains.map(c => {
-      if (c.chain === 'eth') {
-        return {
-          ...c,
-          name: 'Ethereum',
-          symbol: 'ETH',
-        };
-      }
-      return c;
-    });
-
     const jsonResponse = {
-      tokens: wallets.raw,
+      tokens: tokens.result,
       nfts: myNfts,
-      total_networth_usd: networth.raw.total_networth_usd,
-      chains: chains,
     };
 
     res.status(200).json(jsonResponse);
@@ -70,5 +65,6 @@ Moralis.start({
   });
 });
 
-// Test URL:
+// Test URLs:
 // http://localhost:3000/getTokens?userAddress=0x887E3DB0D16807730fA40619c70C4846a79cA854&chain=0x1
+// http://localhost:3000/logo?symbol=eth

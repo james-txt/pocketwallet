@@ -1,6 +1,6 @@
 import { Cross1Icon } from '@radix-ui/react-icons';
 
-const Modal = ({ show, onClose, children }: { show: boolean, onClose: () => void, children: React.ReactNode }) => {
+const NftModal = ({ show, onClose, children }: { show: boolean, onClose: () => void, children: React.ReactNode }) => {
   if (!show) return null;
 
   return (
@@ -13,4 +13,4 @@ const Modal = ({ show, onClose, children }: { show: boolean, onClose: () => void
   );
 };
 
-export default Modal;
+export default NftModal;

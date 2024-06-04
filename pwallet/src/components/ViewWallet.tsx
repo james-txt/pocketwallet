@@ -4,39 +4,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWallet, faArrowRightArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
-import Modal from "./Modal";
+import NftModal from "./NftModal";
 import NftCard from "./NftCard";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
-import arbLogo from "./assets/arb.png";
-import avaxLogo from "./assets/avax.png";
-import baseLogo from "./assets/base.png";
-import bnbLogo from "./assets/bnb.png";
-import ethLogo from "./assets/eth.png";
-import maticLogo from "./assets/matic.png";
-import noneLogo from "./assets/none.png";
-import opLogo from "./assets/op.png";
-
+import noneLogo from "../assets/none.png";
 
 interface ViewWalletProps {
   wallet: string | null;
   selectedChain: string;
 }
 
-interface Chains {
-  chain: string;
-  native_balance_formatted: string;
-  networth_usd: string;
-  name: string;
-  symbol: string;
-}
-
 interface Tokens {
-  chain: string;
-  native_balance_formatted: string;
-  networth_usd: string;
+  token_address: string;
   name: string;
   symbol: string;
+  logo: string;
+  thumbnail: string;
+  decimals: number;
+  balance: string;
+  possible_spam: boolean;
+  verified_contract: boolean;
+  usd_price: number;
+  usd_price_24hr_percent_change: number;
+  usd_price_24hr_usd_change: number;
+  usd_value: number;
+  portfolio_percentage: number;
+  balance_formatted: string;
+  native_token: boolean;
 }
 
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
@@ -44,10 +39,9 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
   const [currentTab, setCurrentTab] = useState("tokenTab");
   const [fadeClass, setFadeClass] = useState("fade-in-left");
   const [nfts, setNfts] = useState<string[]>([]);
-  const [chains, setChains] = useState<Chains[]>([]);
   const [tokens, setTokens] = useState<Tokens[]>([]);
-  const [totalNetworth, setTotalNetworth] = useState<string>("0.00");
   const [fetching, setFetching] = useState(false);
+  const [logoUrls, setLogoUrls] = useState<{ [symbol: string]: string }>({});
 
   const handleTabChange = (value: string) => {
     setFadeClass("fade-out-right");
@@ -57,30 +51,26 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
     }, 100);
   };
 
-  const getChainLogo = (symbol: string) => {
-    switch (symbol) {
-      case "arb":
-        return arbLogo;
-      case "avax":
-        return avaxLogo;
-      case "base":
-        return baseLogo;
-      case "bnb":
-        return bnbLogo;
-      case "eth":
-        return ethLogo;
-      case "matic":
-        return maticLogo;
-      case "op":
-        return opLogo;
-      default:
-        return noneLogo;
+  const fetchLogo = async (symbol: string) => {
+    if (symbol && symbol.length > 5) {
+      return noneLogo;
+    }
+  
+    try {
+      const response = await fetch(`http://localhost:3000/logo?symbol=${symbol}`);
+      if (!response.ok) {
+        throw new Error("Logo not found");
+      }
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error(error);
+      return noneLogo;
     }
   };
 
   const getAccountTokens = useCallback(async () => {
     setFetching(true);
-
     try {
       const res = await axios.get("http://localhost:3000/getTokens", {
         params: {
@@ -88,16 +78,26 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
           chain: selectedChain,
         },
       });
-
       const response = res.data;
       console.log(response);
-
       if (response.nfts.length > 0) {
         setNfts(response.nfts);
       }
-      setChains(response.chains);
       setTokens(response.tokens);
-      setTotalNetworth(response.networth_usd);
+
+      // Fetch logos for each token
+      const newLogoUrls = await Promise.all(
+        response.tokens.map(async (token: Tokens) => {
+          const logoUrl = await fetchLogo(token.symbol);
+          return { symbol: token.symbol, url: logoUrl };
+        })
+      );
+      const logoUrlMap = newLogoUrls.reduce((acc, { symbol, url }) => {
+        acc[symbol] = url;
+        return acc;
+      }, {} as { [symbol: string]: string });
+
+      setLogoUrls(logoUrlMap);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -105,11 +105,14 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
     }
   }, [wallet, selectedChain]);
 
+  const totalNetworth = tokens.reduce((acc, token) => {
+    const usdValue = token.usd_value ?? 0;
+    return acc + usdValue;
+  }, 0).toFixed(2);
+
   useEffect(() => {
     if (!wallet || !selectedChain) return;
     setNfts([]);
-    setChains([]);
-    setTotalNetworth("0.00");
     getAccountTokens();
   }, [getAccountTokens, selectedChain, wallet]);
 
@@ -127,57 +130,44 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
               currentTab === "tokenTab" ? fadeClass : "opacity-0"
             }`}
           >
-            <h2 className="pt-3 pb-5 text-3xl font-semibold tracking-tight">
+            {fetching ?(<Skeleton className="w-1/2 mx-auto bg-offwhite py-3 mt-5 mb-7" /> ):(
+            <h2 className="py-3 text-3xl font-semibold tracking-tight">
               ${parseFloat(totalNetworth).toFixed(2)}
             </h2>
+            )}
             {fetching ? (
-              <Skeleton className="w-full py-8 my-3" />
-            ) : chains.length > 0 ? (
-              <div>
-                {chains.map((chain, index) => (
-                  <div key={index}>
-                    <h2 className="text-lg font-bold">{chain.name}</h2>
-                    <img
-                      src={getChainLogo(chain.symbol)}
-                      alt={`${chain.symbol} Logo`}
-                      className="w-6 h-6"
-                    />
-
-                    <p className="">
-                      {parseFloat(chain.native_balance_formatted).toFixed(5)}{" "}
-                      {chain.symbol}
-                    </p>
-                    <p className="">
-                      ${parseFloat(chain.networth_usd).toFixed(2)}
-                    </p>
-
-                    {tokens.map((token, tokenIndex) => (
-                      <Button
-                        className="w-full py-8 my-3 flex justify-between rounded bg-char font-normal text-offwhite hover:bg-lightgrey"
-                        key={tokenIndex}
-                      >
-                        <div className="flex flex-col">
-                          <img
-                            src={getChainLogo(chain.symbol)}
-                            alt={`${chain.symbol} Logo`}
-                            className="w-6 h-6"
-                          />
-                          <p className="">{token.name}</p>
-                        </div>
-                        <div className="flex flex-col">
-                          <p className="">
-                            {parseFloat(token.native_balance_formatted).toFixed(
-                              5
-                            )}{" "}
-                            {token.symbol}
-                          </p>
-                          <p className="">
-                            ${parseFloat(token.networth_usd).toFixed(2)}
-                          </p>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
+              tokens.map((_, index) => (
+                <Skeleton key={index} className="w-full py-8 my-3 bg-blackest" />
+              ))
+            ) : tokens.length > 0 ? (
+              <div className="">
+                {tokens.map((token, tokenIndex) => (
+                  <Button
+                    className="w-full h-16 py-3 my-3 grid grid-cols-2 rounded bg-char font-normal text-offwhite hover:bg-lightgrey"
+                    key={tokenIndex}
+                  >
+                    <div className="01 justify-self-start flex flex-col gap-1 truncate">
+                      <img
+                        src={logoUrls[token.symbol] || noneLogo}
+                        alt={`${token.symbol} Logo`}
+                        className="w-6 h-6"
+                      />
+                      <p className="text-left">{token.name}</p>
+                    </div>
+                    <div className="02 justify-self-end flex flex-col gap-1">
+                      <p className="text-right">
+                        {parseFloat(token.balance_formatted).toFixed(4)}{" "}
+                        {token.symbol && token.symbol.length <= 5
+                          ? token.symbol
+                          : "???"}
+                      </p>
+                      <p className="text-right">
+                        {token.usd_value
+                          ? `$${token.usd_value.toFixed(2)}`
+                          : "$?.??"}
+                      </p>
+                    </div>
+                  </Button>
                 ))}
               </div>
             ) : (
@@ -262,9 +252,9 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
         </TabsList>
       </Tabs>
       {currentTab === "nft" && (
-        <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <NftModal show={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <NftCard />
-        </Modal>
+        </NftModal>
       )}
     </div>
   );
