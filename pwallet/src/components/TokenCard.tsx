@@ -1,5 +1,5 @@
   
-  const NftCard: React.FC = () => {
+  const TokenCard: React.FC = () => {
     return (
       <div className="">
 
@@ -11,5 +11,5 @@
     );
   };
   
-  export default NftCard;
+  export default TokenCard;
   

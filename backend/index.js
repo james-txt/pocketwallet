@@ -38,16 +38,14 @@ app.get('/getTokens', async (req, res) => {
     const nfts = await Moralis.EvmApi.nft.getWalletNFTs({
       chain: chain,
       address: userAddress,
-      mediaItems: true,
+      normalizeMetadata: true,
+      mediaItems: false,
+      excludeSpam: true,
     });
-
-    const myNfts = nfts.raw.result
-      .filter(e => e?.media?.media_collection?.high?.url && !e.possible_spam && e?.media?.category !== 'video')
-      .map(e => e.media.media_collection.high.url);
 
     const jsonResponse = {
       tokens: tokens.result,
-      nfts: myNfts,
+      nfts: nfts.result,
     };
 
     res.status(200).json(jsonResponse);
