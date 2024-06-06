@@ -1,6 +1,6 @@
 # pocket Wallet
 
-Non-custodial cryptocurrency as web extension for your browser.
+Non-custodial cryptocurrency wallet as an web extension for your browser.
 Providing ability to manage tokens, NFTs and to make transfers.
 
 ![pwalletpreview](docs/pwalletprev.png?raw=true "main")
