@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { DashboardIcon, ActivityLogIcon } from "@radix-ui/react-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,53 +7,29 @@ import { Button } from "@/components/ui/button";
 import Modal from "./Modal";
 import NftCard from "./NftCard";
 import TokenCard from "./TokenCard";
-import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import noneLogo from "../assets/none.png";
-import { fetchLogo } from "../utils/fetchLogo";
 import { calculateTotalNetworth } from "@/utils/calculateNetworth";
-export type { Tokens };
+import useFetchTokensAndNfts from "../hooks/useFetchTokensAndNfts";
+import { Nfts, Tokens } from "../hooks/useFetchTokensAndNfts";
 
 interface ViewWalletProps {
   wallet: string | null;
   selectedChain: string;
 }
 
-interface Tokens {
-  token_address: string;
-  name: string;
-  symbol: string;
-  logo: string;
-  thumbnail: string;
-  decimals: number;
-  balance: string;
-  possible_spam: boolean;
-  verified_contract: boolean;
-  usd_price: number;
-  usd_price_24hr_percent_change: number;
-  usd_price_24hr_usd_change: number;
-  usd_value: number;
-  portfolio_percentage: number;
-  balance_formatted: string;
-  native_token: boolean;
-}
-
-interface Nfts {
-  metadata: {
-    image: string;
-    name:string;
-}}
-
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
   const [isNftModalOpen, setIsNftModalOpen] = useState(false);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
-  const [fadeInClass, setFadeInClass] = useState('');
   const [currentTab, setCurrentTab] = useState("tokenTab");
   const [fadeClass, setFadeClass] = useState("fade-in-left");
-  const [nfts, setNfts] = useState<Nfts[]>([]);
-  const [tokens, setTokens] = useState<Tokens[]>([]);
-  const [fetching, setFetching] = useState(false);
-  const [logoUrls, setLogoUrls] = useState<{ [symbol: string]: string }>({});
+  const [selectedNft, setSelectedNft] = useState<Nfts | null>(null);
+  const [selectedToken, setSelectedToken] = useState<Tokens | null>(null);
+
+  const { tokens, nfts, fetching, logoUrls } = useFetchTokensAndNfts(
+    wallet,
+    selectedChain
+  );
 
   const handleTabChange = (value: string) => {
     setFadeClass("fade-out-right");
@@ -63,70 +39,30 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
     }, 100);
   };
 
-  const openModal = (modalType: "nft" | "token") => {
-    setFadeClass('fade-in');
+  const openModal = (modalType: "nft" | "token", item: Nfts | Tokens | null = null) => {
+    setFadeClass("fade-in");
     if (modalType === "nft") {
+      setSelectedNft(item as Nfts);
       setIsNftModalOpen(true);
     } else if (modalType === "token") {
+      setSelectedToken(item as Tokens);
       setIsTokenModalOpen(true);
     }
   };
+  
 
   const closeModal = (modalType: "nft" | "token") => {
-    setFadeClass('fade-out');
+    setFadeClass("fade-out");
     setTimeout(() => {
       if (modalType === "nft") {
         setIsNftModalOpen(false);
       } else if (modalType === "token") {
         setIsTokenModalOpen(false);
       }
-      setFadeInClass('');
     }, 100);
   };
 
-  const getAccountTokens = useCallback(async () => {
-    setFetching(true);
-    try {
-      const res = await axios.get("http://localhost:3000/getTokens", {
-        params: {
-          userAddress: wallet,
-          chain: selectedChain,
-        },
-      });
-      const response = res.data;
-      console.log(response);
-      if (response.nfts.length > 0) {
-        setNfts(response.nfts);
-      }
-      setTokens(response.tokens);
-
-      // Fetch logos for each token
-      const newLogoUrls = await Promise.all(
-        response.tokens.map(async (token: Tokens) => {
-          const logoUrl = await fetchLogo(token.symbol);
-          return { symbol: token.symbol, url: logoUrl };
-        })
-      );
-      const logoUrlMap = newLogoUrls.reduce((acc, { symbol, url }) => {
-        acc[symbol] = url;
-        return acc;
-      }, {} as { [symbol: string]: string });
-
-      setLogoUrls(logoUrlMap);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setFetching(false);
-    }
-  }, [wallet, selectedChain]);
-
   const totalNetworth = calculateTotalNetworth(tokens);
-
-  useEffect(() => {
-    if (!wallet || !selectedChain) return;
-    setNfts([]);
-    getAccountTokens();
-  }, [getAccountTokens, selectedChain, wallet]);
 
   return (
     <div className="content">
@@ -160,31 +96,35 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
               <div className="">
                 {tokens.map((token, tokenIndex) => (
                   <Button
-                    className="w-full h-16 py-3 my-3 grid grid-cols-2 rounded bg-char font-normal text-offwhite hover:bg-lightgrey"
+                    className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm"
                     key={tokenIndex}
-                    onClick={() => openModal("token")}
+                    onClick={() => openModal("token", token)}
                   >
-                    <div className="01 justify-self-start flex flex-col gap-1 truncate">
+                    <div className="flex gap-2 place-items-center">
                       <img
                         src={logoUrls[token.symbol] || noneLogo}
                         alt={`${token.symbol} Logo`}
-                        className="w-6 h-6"
+                        className="w-12 h-12"
                       />
-                      <p className="text-left">{token.name}</p>
+                      <div className="">
+                        <p className="text-left truncate">
+                          {token.name.length > 15
+                            ? `${token.name.slice(0, 15)}...`
+                            : token.name}
+                        </p>
+                        <p className="text-right truncate">
+                          {parseFloat(token.balance_formatted).toFixed(4)}{" "}
+                          {token.symbol && token.symbol.length <= 5
+                            ? token.symbol
+                            : "???"}
+                        </p>
+                      </div>
                     </div>
-                    <div className="02 justify-self-end flex flex-col gap-1">
-                      <p className="text-right">
-                        {parseFloat(token.balance_formatted).toFixed(4)}{" "}
-                        {token.symbol && token.symbol.length <= 5
-                          ? token.symbol
-                          : "???"}
-                      </p>
-                      <p className="text-right">
-                        {token.usd_value
-                          ? `$${token.usd_value.toFixed(2)}`
-                          : "$?.??"}
-                      </p>
-                    </div>
+                    <p className="text-right place-items-right">
+                      {token.usd_value
+                        ? `$${token.usd_value.toFixed(2)}`
+                        : "$?.??"}
+                    </p>
                   </Button>
                 ))}
               </div>
@@ -207,18 +147,18 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
                 nfts.map((nft, index) => (
                   <Button
                     key={index}
-                    onClick={() => openModal("nft")}
+                    onClick={() => openModal("nft", nft)}
                     style={{ cursor: "pointer" }}
-                    className="relative rounded-md w-full h-full overflow-hidden p-0 hover:bg-blackest bg-blackest"
+                    className="relative rounded-md w-full h-full overflow-hidden p-0 hover:bg-chared bg-chared shadow-blackest shadow-sm"
                   >
                     <img
                       src={nft.metadata.image}
                       alt={`nft-${index}`}
                       className="object-contain"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-blackest bg-opacity-80 text-offwhite rounded-md m-2 px-2 py-0.5 truncate">
+                    <h4 className="absolute bottom-0 left-0 right-0 bg-blackest bg-opacity-80 text-offwhite rounded-md m-2 px-2 py-0.5 truncate">
                       {nft.metadata.name}
-                    </div>
+                    </h4>
                   </Button>
                 ))
               ) : (
@@ -245,54 +185,45 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
             Make transfers in your account here.
           </TabsContent>
         </div>
-        <TabsList className="fixed grid w-[320px] grid-cols-4 h-[54px] rounded-none bg-blacker focus:bg-blacker">
+        <TabsList className="fixed grid w-[320px] grid-cols-4 h-[64px] rounded-none bg-blacker focus:bg-blacker">
           <TabsTrigger
             value="tokenTab"
-            className="bg-blacker rounded-none text-base pt-3 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
+            className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("tokenTab")}
           >
             <FontAwesomeIcon size="xl" icon={faWallet} />
           </TabsTrigger>
           <TabsTrigger
             value="nftTab"
-            className="bg-blacker rounded-none text-base pt-3 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
+            className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("nftTab")}
           >
             <DashboardIcon className="h-6 w-6 flex-shrink-0" />
           </TabsTrigger>
           <TabsTrigger
             value="activityTab"
-            className="bg-blacker rounded-none text-base pt-3 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
+            className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("activityTab")}
           >
             <ActivityLogIcon className="h-6 w-6 flex-shrink-0" />
           </TabsTrigger>
           <TabsTrigger
             value="transferTab"
-            className="bg-blacker rounded-none text-base pt-3 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
+            className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("transferTab")}
           >
             <FontAwesomeIcon size="xl" icon={faArrowRightArrowLeft} />
           </TabsTrigger>
         </TabsList>
       </Tabs>
-      {currentTab === "nftTab" && (
-        <Modal
-          show={isNftModalOpen}
-          onClose={() => closeModal("nft")}
-          animationClass={fadeInClass}
-        >
-          <NftCard />
+      {currentTab === "tokenTab" && (
+        <Modal isOpen={isTokenModalOpen} onClose={() => closeModal("token")}>
+          {selectedToken && <TokenCard token={selectedToken} logoUrls={logoUrls} />}
         </Modal>
       )}
-
-      {currentTab === "tokenTab" && (
-        <Modal
-          show={isTokenModalOpen}
-          onClose={() => closeModal("token")}
-          animationClass={fadeInClass}
-        >
-          <TokenCard />
+      {currentTab === "nftTab" && (
+        <Modal isOpen={isNftModalOpen} onClose={() => closeModal("nft")}>
+          {selectedNft && <NftCard nft={selectedNft} />}
         </Modal>
       )}
     </div>

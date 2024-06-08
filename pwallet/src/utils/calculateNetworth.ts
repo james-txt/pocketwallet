@@ -1,4 +1,4 @@
-import type { Tokens } from "../components/ViewWallet.tsx";
+import { Tokens } from "../hooks/useFetchTokensAndNfts";
 
 
 export const calculateTotalNetworth = (tokens: Tokens[]): string => {

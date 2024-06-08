@@ -1,7 +1,17 @@
-import { Cross1Icon } from '@radix-ui/react-icons';
+import React from "react";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
-const Modal = ({ show, onClose, children, animationClass }: { show: boolean, onClose: () => void, children: React.ReactNode, animationClass: string }) => {
-  if (!show) return null;
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  animationClass?: string; // Optional animationClass prop
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, animationClass }) => {
+  if (!isOpen) { // Use isOpen instead of show
+    return null;
+  }
 
   return (
     <div className={`fixed z-10 modal bg-blacker border-lightgrey border border-t-0 ${animationClass}`}>

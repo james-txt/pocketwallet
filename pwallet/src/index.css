@@ -154,6 +154,18 @@
     @apply w-[350px] h-16 flex justify-between items-center bg-blacker text-offwhite border border-t-0 border-lightgrey;
   }
 
+  h2 {
+    @apply scroll-m-20 text-2xl font-semibold
+  }
+
+  h3 {
+    @apply scroll-m-20 text-xl font-semibold
+  }
+
+  h4 {
+    @apply scroll-m-20 text-base font-semibold
+  }
+
   .App {
     @apply text-center w-[350px] h-[600px] justify-start items-center flex flex-col bg-blacker text-offwhite border border-lightgrey font-titillium leading-6 [&:not(:first-child)]:mt-6;
   }
@@ -162,7 +174,7 @@
     @apply text-center w-[350px] h-[535px] overflow-hidden justify-start items-center flex flex-col relative;
   }
   .modal {
-    @apply text-center w-[350px] h-[469px] overflow-hidden justify-start items-center flex flex-col relative;
+    @apply text-center w-[350px] h-[470px] px-4 overflow-hidden justify-start items-center flex flex-col scrollbar-hide overflow-y-scroll relative;
   }
 
   .seedPhraseContainer {
