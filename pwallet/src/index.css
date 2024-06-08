@@ -154,6 +154,10 @@
     @apply w-[350px] h-16 flex justify-between items-center bg-blacker text-offwhite border border-t-0 border-lightgrey;
   }
 
+  h1 {
+    @apply scroll-m-20 text-4xl font-semibold
+  }
+
   h2 {
     @apply scroll-m-20 text-2xl font-semibold
   }

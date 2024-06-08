@@ -47,7 +47,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls }) => {
             Price:
           </CardTitle>
           <CardDescription className="col-span-3 font-normal text-base text-right text-offwhite truncate">
-            {token.usd_price || "???"} USD
+            {token.usd_price ? `$${token.usd_price.toFixed(2)}` : "$?.??"}
           </CardDescription>
         </CardContent>
         <CardContent className="p-4 py-2">

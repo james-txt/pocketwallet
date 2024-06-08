@@ -16,6 +16,7 @@ export interface Tokens {
   usd_price: number;
   usd_price_24hr_percent_change: number;
   usd_price_24hr_usd_change: number;
+  usd_value_24hr_usd_change: number;
   usd_value: number;
   portfolio_percentage: number;
   balance_formatted: string;

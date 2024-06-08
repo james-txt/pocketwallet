@@ -9,7 +9,7 @@ import NftCard from "./NftCard";
 import TokenCard from "./TokenCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import noneLogo from "../assets/none.png";
-import { calculateTotalNetworth } from "@/utils/calculateNetworth";
+import { calculateTotalNetworth, calculateNetworth24hrUsdChange, calculateNetworth24hrPctChange } from "@/utils/calculateNetworth";
 import useFetchTokensAndNfts from "../hooks/useFetchTokensAndNfts";
 import { Nfts, Tokens } from "../hooks/useFetchTokensAndNfts";
 
@@ -62,7 +62,9 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
     }, 100);
   };
 
-  const totalNetworth = calculateTotalNetworth(tokens);
+  const totalNetworth = parseFloat(calculateTotalNetworth(tokens).toFixed(2));
+  const totalNetworth24hrUsdChange = parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2));
+  const totalNetworth24hrPctChange = parseFloat(calculateNetworth24hrPctChange(tokens).toFixed(2));
 
   return (
     <div className="content">
@@ -79,12 +81,52 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
             }`}
           >
             {fetching ? (
-              <Skeleton className="w-1/2 mx-auto bg-offwhite py-3 mt-5 mb-7" />
+              <Skeleton className="w-1/2 bg-offwhite mx-auto py-4 my-5" />
             ) : (
-              <h2 className="py-3 text-3xl font-semibold tracking-tight">
-                ${parseFloat(totalNetworth).toFixed(2)}
-              </h2>
+              <h1 className="pt-3 pb-2 text-5xl tracking-tight">
+                ${totalNetworth ? totalNetworth : "0.00"}
+              </h1>
             )}
+            <div className="flex gap-2 justify-center mb-5 tracking-tight">
+              {fetching ? (
+                <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
+              ) : (
+                <h2
+                  className={`${
+                    totalNetworth24hrUsdChange > 0.01
+                      ? "text-green-500 font-semibold"
+                      : totalNetworth24hrUsdChange < -0.01
+                        ? "text-red-500 font-light"
+                        : "text-offwhite"
+                  }`}
+                >
+                  {totalNetworth24hrUsdChange > 0.01 
+                    ? `+$${totalNetworth24hrUsdChange.toFixed(2)}` 
+                    : totalNetworth24hrUsdChange < -0.01 
+                    ? `-$${totalNetworth24hrUsdChange.toFixed(2)}`
+                    : "0.00"}
+                </h2>
+              )}
+              {fetching ? (
+                <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
+              ) : (
+                <h2
+                  className={`${
+                    totalNetworth24hrPctChange > 0.01
+                      ? "text-green-500 bg-green-500 rounded bg-opacity-10 px-2 font-semibold"
+                      : totalNetworth24hrPctChange < -0.01
+                        ? "text-red-500 bg-red-500 rounded bg-opacity-10 px-2 font-light"
+                        : "text-offwhite"
+                  }`}
+                >
+                  {totalNetworth24hrPctChange > 0.01 
+                  ? `+${totalNetworth24hrPctChange.toFixed(2)}%` 
+                  : totalNetworth24hrPctChange < -0.01
+                  ? `-${totalNetworth24hrPctChange.toFixed(2)}%`
+                  : "0.00"}
+                </h2>
+              )}
+            </div>
             {fetching ? (
               tokens.map((_, index) => (
                 <Skeleton
@@ -101,30 +143,65 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
                     onClick={() => openModal("token", token)}
                   >
                     <div className="flex gap-2 place-items-center">
-                      <img
-                        src={logoUrls[token.symbol] || noneLogo}
-                        alt={`${token.symbol} Logo`}
-                        className="w-12 h-12"
-                      />
+                      {fetching ? (
+                        <Skeleton className="w-12 h-12 bg-offwhite rounded-full" />
+                      ) : (
+                        <img
+                          src={logoUrls[token.symbol] || noneLogo}
+                          alt={`${token.symbol} Logo`}
+                          className="w-12 h-12"
+                        />
+                      )}
                       <div className="">
-                        <p className="text-left truncate">
-                          {token.name.length > 15
-                            ? `${token.name.slice(0, 15)}...`
-                            : token.name}
-                        </p>
-                        <p className="text-right truncate">
-                          {parseFloat(token.balance_formatted).toFixed(4)}{" "}
-                          {token.symbol && token.symbol.length <= 5
-                            ? token.symbol
-                            : "???"}
-                        </p>
+                        {fetching ? (
+                          <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
+                        ) : (
+                          <p className="text-left truncate">
+                            {token.name.length > 15
+                              ? `${token.name.slice(0, 15)}...`
+                              : token.name}
+                          </p>
+                        )}
+                        {fetching ? (
+                          <Skeleton className="h-4 w-1/2 bg-offwhite" />
+                        ) : (
+                          <p className="text-right truncate">
+                            {parseFloat(token.balance_formatted).toFixed(4)}{" "}
+                            {token.symbol && token.symbol.length <= 5
+                              ? token.symbol
+                              : "???"}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <p className="text-right place-items-right">
-                      {token.usd_value
-                        ? `$${token.usd_value.toFixed(2)}`
-                        : "$?.??"}
-                    </p>
+                    <div className="">
+                      {fetching ? (
+                        <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
+                      ) : (
+                        <p className="text-right">
+                          {token.usd_value
+                            ? `$${token.usd_value.toFixed(2)}`
+                            : "$0.00"}
+                        </p>
+                      )}
+                      {fetching ? (
+                        <Skeleton className="h-4 w-1/2 bg-offwhite" />
+                      ) : (
+                        <p
+                          className={`text-right ${
+                            token.usd_value_24hr_usd_change > 0.01
+                              ? "text-green-500 font-semibold"
+                              : token.usd_value_24hr_usd_change < -0.01
+                                ? "text-red-500 font-light"
+                                : "text-offwhite"
+                          }`}
+                        >
+                          {token.usd_value && token.usd_value_24hr_usd_change
+                            ? `$${token.usd_value_24hr_usd_change.toFixed(2)}`
+                            : "$0.00"}
+                        </p>
+                      )}
+                    </div>
                   </Button>
                 ))}
               </div>
@@ -218,7 +295,9 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
       </Tabs>
       {currentTab === "tokenTab" && (
         <Modal isOpen={isTokenModalOpen} onClose={() => closeModal("token")}>
-          {selectedToken && <TokenCard token={selectedToken} logoUrls={logoUrls} />}
+          {selectedToken && (
+            <TokenCard token={selectedToken} logoUrls={logoUrls} />
+          )}
         </Modal>
       )}
       {currentTab === "nftTab" && (
