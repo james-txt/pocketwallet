@@ -183,7 +183,7 @@
 
   .seedPhraseContainer {
     @apply w-full min-h-[160px] max-h-[250px] mt-1 border-amber p-2 grid grid-cols-3;
-  }
+  } 
 
   .fade-in-left {
     @apply animate-[fadeInLeft_0.1s_forwards];

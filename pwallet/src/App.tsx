@@ -98,7 +98,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      <header>
+      <header className='z-20'>
         {menuHeader()}
         {wallet && (
           <TooltipProvider delayDuration={0}>
@@ -134,15 +134,18 @@ const App: React.FC = () => {
           onValueChange={(val) => setSelectedChain(val)}
           value={selectedChain}
         >
-          <SelectTrigger className="w-16 mr-3 rounded-full bg-blackest border-none">
+          <SelectTrigger className="w-14 px-0 mr-3 rounded-full justify-center bg-chared hover:bg-char data-[state=open]:bg-char border-none ">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="w-16 min-w-0 rounded-md bg-blackest text-offwhite border-blacker">
+          <SelectContent className="w-14 min-w-0 rounded-md bg-chared text-offwhite border-none shadow-sm shadow-blackest"
+          position="popper"
+          sideOffset={-2}
+          >
             <SelectItem value="0x4268" textValue="ETHTEST">
-              EthTestnet
+              EthT
             </SelectItem>
             <SelectItem value="0x13882" textValue="POLYTEST">
-              PolyTestnet
+              PolyT
             </SelectItem>
             <SelectItem value="0x1" textValue="ETH">
               <div className="w-6 h-6 bg-offwhite rounded-full">

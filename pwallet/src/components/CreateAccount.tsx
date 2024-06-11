@@ -43,7 +43,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
         </AlertDescription>
       </Alert>
       <Button
-        className="my-7 bg-sky text-blackest w-10/12"
+        className="my-7 bg-sky text-blackest w-full shadow-blackest shadow-sm"
         onClick={generateWallet}
       >
         Generate Seed Phrase
@@ -58,7 +58,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
           ))}
       </Card>
       <Button
-        className="my-7 bg-amber text-blackest w-10/12"
+        className="my-7 bg-amber text-blackest w-full shadow-blackest shadow-sm"
         onClick={setWalletAndMnemonic}
       >
         Open Your New Wallet!

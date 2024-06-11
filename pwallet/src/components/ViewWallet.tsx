@@ -81,64 +81,64 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
             }`}
           >
             {fetching ? (
-              <Skeleton className="w-1/2 bg-offwhite mx-auto py-4 my-5" />
+              <Skeleton className="w-1/2 bg-offwhite mx-auto py-4 mb-5 mt-8" />
             ) : (
-              <h1 className="pt-3 pb-2 text-5xl tracking-tight">
+              <h1 className="pt-6 pb-2 text-5xl tracking-tight">
                 ${totalNetworth ? totalNetworth : "0.00"}
               </h1>
             )}
-            <div className="flex gap-2 justify-center mb-5 tracking-tight">
+            <div className="flex gap-2 justify-center mb-8 tracking-tight">
               {fetching ? (
                 <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
               ) : (
-                <h2
+                <h3
                   className={`${
-                    totalNetworth24hrUsdChange > 0.01
+                    totalNetworth24hrUsdChange > 0.001
                       ? "text-green-500 font-semibold"
-                      : totalNetworth24hrUsdChange < -0.01
+                      : totalNetworth24hrUsdChange < -0.001
                         ? "text-red-500 font-light"
                         : "text-offwhite"
                   }`}
                 >
-                  {totalNetworth24hrUsdChange > 0.01 
+                  {totalNetworth24hrUsdChange > 0.001 
                     ? `+$${totalNetworth24hrUsdChange.toFixed(2)}` 
-                    : totalNetworth24hrUsdChange < -0.01 
-                    ? `-$${totalNetworth24hrUsdChange.toFixed(2)}`
+                    : totalNetworth24hrUsdChange < -0.001 
+                    ? `-$${Math.abs(totalNetworth24hrUsdChange).toFixed(2)}`
                     : "0.00"}
-                </h2>
+                </h3>
               )}
               {fetching ? (
                 <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
               ) : (
-                <h2
+                <h3
                   className={`${
-                    totalNetworth24hrPctChange > 0.01
+                    totalNetworth24hrPctChange > 0.001
                       ? "text-green-500 bg-green-500 rounded bg-opacity-10 px-2 font-semibold"
-                      : totalNetworth24hrPctChange < -0.01
+                      : totalNetworth24hrPctChange < -0.001
                         ? "text-red-500 bg-red-500 rounded bg-opacity-10 px-2 font-light"
                         : "text-offwhite"
                   }`}
                 >
-                  {totalNetworth24hrPctChange > 0.01 
+                  {totalNetworth24hrPctChange > 0.001 
                   ? `+${totalNetworth24hrPctChange.toFixed(2)}%` 
-                  : totalNetworth24hrPctChange < -0.01
-                  ? `-${totalNetworth24hrPctChange.toFixed(2)}%`
+                  : totalNetworth24hrPctChange < -0.001
+                  ? `${totalNetworth24hrPctChange.toFixed(2)}%`
                   : "0.00"}
-                </h2>
+                </h3>
               )}
             </div>
             {fetching ? (
               tokens.map((_, index) => (
                 <Skeleton
                   key={index}
-                  className="w-full py-8 my-3 bg-blackest"
+                  className="w-full py-8 my-3 bg-char"
                 />
               ))
             ) : tokens.length > 0 ? (
               <div className="">
                 {tokens.map((token, tokenIndex) => (
                   <Button
-                    className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm"
+                    className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
                     key={tokenIndex}
                     onClick={() => openModal("token", token)}
                   >
@@ -189,15 +189,15 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
                       ) : (
                         <p
                           className={`text-right ${
-                            token.usd_value_24hr_usd_change > 0.01
+                            token.usd_value_24hr_usd_change > 0.001
                               ? "text-green-500 font-semibold"
-                              : token.usd_value_24hr_usd_change < -0.01
+                              : token.usd_value_24hr_usd_change < -0.001
                                 ? "text-red-500 font-light"
                                 : "text-offwhite"
                           }`}
                         >
                           {token.usd_value && token.usd_value_24hr_usd_change
-                            ? `$${token.usd_value_24hr_usd_change.toFixed(2)}`
+                            ? `-$${Math.abs(token.usd_value_24hr_usd_change).toFixed(2)}`
                             : "$0.00"}
                         </p>
                       )}
@@ -215,10 +215,10 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
               currentTab === "nftTab" ? fadeClass : "opacity-0"
             }`}
           >
-            <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="grid grid-cols-2 gap-2 mt-1 mb-4">
               {fetching ? (
                 Array.from({ length: 8 }).map((_, index) => (
-                  <Skeleton key={index} className="w-full rounded-md h-32" />
+                  <Skeleton key={index} className="w-full rounded-md h-[156px] bg-blacker" />
                 ))
               ) : nfts.length > 0 ? (
                 nfts.map((nft, index) => (
@@ -226,7 +226,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
                     key={index}
                     onClick={() => openModal("nft", nft)}
                     style={{ cursor: "pointer" }}
-                    className="relative rounded-md w-full h-full overflow-hidden p-0 hover:bg-chared bg-chared shadow-blackest shadow-sm"
+                    className="relative rounded-md w-full h-full overflow-hidden p-0 hover:bg-inherit bg-blacker shadow-blackest shadow-sm"
                   >
                     <img
                       src={nft.metadata.image}
@@ -262,7 +262,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
             Make transfers in your account here.
           </TabsContent>
         </div>
-        <TabsList className="fixed grid w-[320px] grid-cols-4 h-[64px] rounded-none bg-blacker focus:bg-blacker">
+        <TabsList className="z-10 fixed grid w-[320px] grid-cols-4 h-[64px] rounded-none bg-blacker focus:bg-blacker">
           <TabsTrigger
             value="tokenTab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"

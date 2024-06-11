@@ -29,6 +29,10 @@ export interface Nfts {
     name: string;
     image: string;
     description: string;
+    attributes: Array<{
+      trait_type: string;
+      value: string;
+    }>;
   };
   tokenId: number;
 }

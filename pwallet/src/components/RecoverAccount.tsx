@@ -57,7 +57,7 @@ const RecoverAccount: React.FC<RecoverAccountProps> = ({ setWallet, setSeedPhras
       ></Textarea>
             <Button
               disabled={typedSeed === null || typedSeed.split(" ").length !== 12 || typedSeed.slice(-1) === " "}
-              className="mt-7 bg-sky text-blackest w-10/12"
+              className="mt-7 bg-sky text-blackest w-full shadow-blackest shadow-sm"
               onClick={() => recoverWallet()}
             >
               Recover Wallet

@@ -2,13 +2,9 @@
 import React from "react";
 import { Tokens } from "../hooks/useFetchTokensAndNfts";
 import noneLogo from "../assets/none.png";
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
+import { Card, CardContent, CardDescription, CardTitle,
 } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 interface TokenCardProps {
   token: Tokens;
@@ -17,15 +13,13 @@ interface TokenCardProps {
 
 const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls }) => {
   return (
-    <div className="">
-      <div className="">
+    <div>
         <h2 className="py-3">
           {token.name.length > 19
             ? `${token.name.slice(0, 19)}...`
             : token.name}
           <span className="text-lightgrey"></span>
         </h2>
-      </div>
       <img
         src={logoUrls[token.symbol] || noneLogo}
         alt={`${token.symbol} Logo`}
@@ -59,6 +53,9 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls }) => {
           </CardDescription>
         </CardContent>
       </Card>
+      <Button className="my-8 w-full bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm">
+        Send
+      </Button>
     </div>
   );
 };

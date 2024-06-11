@@ -20,7 +20,7 @@ module.exports = { // eslint-disable-line
       colors: {
         lightgrey: "#616161",
         char:"#414141",
-        chared:"#313131",
+        chared:"#2D2D2D",
         blackest: "#121212",
         blacker: "#242424",
         sky: "#4EA8DE",
