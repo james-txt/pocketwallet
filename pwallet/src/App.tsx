@@ -7,8 +7,6 @@ import ViewWallet from './components/ViewWallet';
 import logoSM from "./assets/logoSM.png";
 import arbLogo from "./assets/arb.png";
 import avaxLogo from "./assets/avax.png";
-import baseLogo from "./assets/base.png";
-import bnbLogo from "./assets/bnb.png";
 import ethLogo from "./assets/eth.png";
 import maticLogo from "./assets/matic.png";
 import opLogo from "./assets/op.png";
@@ -16,11 +14,10 @@ import { Button } from './components/ui/button';
 import { CheckboxIcon, CopyIcon, LockClosedIcon, Cross1Icon } from "@radix-ui/react-icons";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import useClipboard from './utils/useClipboard';
 
 const App: React.FC = () => {
-  const [tooltipAddressText, setTooltipAddressText] = useState("Copy to clipboard");
-  const [copied, setCopied] = useState(false);
-  const [open, setOpen] = useState(false);
+  const { tooltipText, copied, open, copyToClipboard, setOpen } = useClipboard();
   const [wallet, setWallet] = useState<string | null>(null);
   const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
   const [selectedChain, setSelectedChain] = useState('0x1');
@@ -38,18 +35,9 @@ const App: React.FC = () => {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
-  const copyToClipboard = () => {
+  const handleCopyToClipboard = () => {
     if (wallet) {
-      navigator.clipboard.writeText(wallet).then(() => {
-        setTooltipAddressText("Copied!");
-        setOpen(true);
-        setCopied(true);
-        setTimeout(() => {
-          setTooltipAddressText("Copy to clipboard");
-          setOpen(false);
-          setCopied(false);
-        }, 3000);
-      });
+      copyToClipboard(wallet);
     }
   };
 
@@ -106,7 +94,7 @@ const App: React.FC = () => {
               <TooltipTrigger asChild>
                 <Button
                   className="w-auto h-8 bg-blacker hover:bg-char flex items-center justify-center truncate"
-                  onClick={copyToClipboard}
+                  onClick={handleCopyToClipboard}
                 >
                   <span className="truncate">
                     {truncateWalletAddress(wallet)}
@@ -125,7 +113,7 @@ const App: React.FC = () => {
                 alignOffset={-20}
                 className="bg-char border-none shadow-sm shadow-blackest"
               >
-                <p>{tooltipAddressText}</p>
+                <p>{tooltipText}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -141,7 +129,7 @@ const App: React.FC = () => {
           position="popper"
           sideOffset={-2}
           >
-            <SelectItem value="0x4268" textValue="ETHTEST">
+            <SelectItem value="0xaa36a7" textValue="ETHTEST">
               EthT
             </SelectItem>
             <SelectItem value="0x13882" textValue="POLYTEST">
@@ -158,14 +146,8 @@ const App: React.FC = () => {
             <SelectItem value="0xa86a" textValue="AVAX">
               <img src={avaxLogo} loading="lazy" alt="avaxLogo" className="w-6 h-6" />
             </SelectItem>
-            <SelectItem value="0x38" textValue="BNB">
-              <img src={bnbLogo} loading="lazy" alt="bnbLogo" className="w-6 h-6" />
-            </SelectItem>
             <SelectItem value="0xa4b1" textValue="ARB">
               <img src={arbLogo} loading="lazy" alt="arbLogo" className="w-6 h-6" />
-            </SelectItem>
-            <SelectItem value="0x2105" textValue="BASE">
-              <img src={baseLogo} loading="lazy" alt="baseLogo" className="w-6 h-6" />
             </SelectItem>
             <SelectItem value="0xa" textValue="OP">
               <img src={opLogo} loading="lazy" alt="opLogo" className="w-6 h-6" />
@@ -197,7 +179,11 @@ const App: React.FC = () => {
           <Route
             path="/yourwallet"
             element={
-              <ViewWallet wallet={wallet} selectedChain={selectedChain} />
+              <ViewWallet 
+              wallet={wallet} 
+              selectedChain={selectedChain}
+              seedPhrase={seedPhrase}
+              />
             }
           />
         )}

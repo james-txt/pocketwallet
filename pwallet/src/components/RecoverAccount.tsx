@@ -52,7 +52,7 @@ const RecoverAccount: React.FC<RecoverAccountProps> = ({ setWallet, setSeedPhras
       <Textarea
         value={typedSeed || ""}
         onChange={seedAdjust}
-        className="seedPhraseContainer mt-7 pt-3 px-4 min-h-[100px] bg-black text-offwhite border-sky"
+        className="seedPhraseContainer mt-7 pt-3 px-4 resize-none min-h-[90px] bg-black text-offwhite border-sky"
         placeholder="Type your seed phrase here"
       ></Textarea>
             <Button

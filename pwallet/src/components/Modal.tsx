@@ -5,11 +5,11 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  animationClass?: string; // Optional animationClass prop
+  animationClass?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, animationClass }) => {
-  if (!isOpen) { // Use isOpen instead of show
+  if (!isOpen) { 
     return null;
   }
 

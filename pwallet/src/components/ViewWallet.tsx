@@ -14,11 +14,12 @@ import useFetchTokensAndNfts from "../hooks/useFetchTokensAndNfts";
 import { Nfts, Tokens } from "../hooks/useFetchTokensAndNfts";
 
 interface ViewWalletProps {
-  wallet: string | null;
+  wallet: string;
   selectedChain: string;
+  seedPhrase: string;
 }
 
-const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
+const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhrase }) => {
   const [isNftModalOpen, setIsNftModalOpen] = useState(false);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState("tokenTab");
@@ -65,6 +66,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
   const totalNetworth = parseFloat(calculateTotalNetworth(tokens).toFixed(2));
   const totalNetworth24hrUsdChange = parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2));
   const totalNetworth24hrPctChange = parseFloat(calculateNetworth24hrPctChange(tokens).toFixed(2));
+
 
   return (
     <div className="content">
@@ -296,7 +298,11 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain }) => {
       {currentTab === "tokenTab" && (
         <Modal isOpen={isTokenModalOpen} onClose={() => closeModal("token")}>
           {selectedToken && (
-            <TokenCard token={selectedToken} logoUrls={logoUrls} />
+            <TokenCard 
+            token={selectedToken}
+            logoUrls={logoUrls}
+            seedPhrase={seedPhrase}
+            />
           )}
         </Modal>
       )}

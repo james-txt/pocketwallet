@@ -90,13 +90,11 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
                 style={{ cursor: "pointer" }}
               />
             </DrawerClose>
-            <DrawerTitle>
-              <h2 className="py-3 ml-6 mr-1 font-semibold text-offwhite">
+            <DrawerTitle className="py-3 ml-6 mr-1 font-semibold text-offwhite">
                 {nft.metadata.name.length > 19
                   ? `${nft.metadata.name.slice(0, 19)}...`
                   : nft.metadata.name}
                 <span className="text-lightgrey"> x{nft.amount}</span>
-              </h2>
             </DrawerTitle>
             <DrawerDescription>
               {" "}
@@ -108,12 +106,12 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
             </DrawerDescription>
           </DrawerHeader>
           <Textarea
-            className="bg-blackest h-16 text-offwhite border-sky"
+            className="bg-blackest resize-none min-h-[60px] h-16 text-offwhite border-lightgrey focus:border-sky"
             placeholder="Recipient's address"
           />
           <DrawerFooter className="flex flex-row w-full gap-4 p-0 my-4">
-            <DrawerClose className="w-1/2">
-              <Button className="w-full bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm">
+            <DrawerClose asChild>
+              <Button className="w-1/2 bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm">
                 Cancel
               </Button>
             </DrawerClose>
