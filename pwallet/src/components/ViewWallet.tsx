@@ -12,11 +12,12 @@ import noneLogo from "../assets/none.png";
 import { calculateTotalNetworth, calculateNetworth24hrUsdChange, calculateNetworth24hrPctChange } from "@/utils/calculateNetworth";
 import useFetchTokensAndNfts from "../hooks/useFetchTokensAndNfts";
 import { Nfts, Tokens } from "../hooks/useFetchTokensAndNfts";
+import { ChainKey } from '../utils/chains';
 
 interface ViewWalletProps {
   wallet: string;
-  selectedChain: string;
   seedPhrase: string;
+  selectedChain: ChainKey;
 }
 
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhrase }) => {
@@ -66,7 +67,6 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
   const totalNetworth = parseFloat(calculateTotalNetworth(tokens).toFixed(2));
   const totalNetworth24hrUsdChange = parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2));
   const totalNetworth24hrPctChange = parseFloat(calculateNetworth24hrPctChange(tokens).toFixed(2));
-
 
   return (
     <div className="content">
@@ -167,7 +167,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         {fetching ? (
                           <Skeleton className="h-4 w-1/2 bg-offwhite" />
                         ) : (
-                          <p className="text-right truncate">
+                          <p className="text-left truncate">
                             {parseFloat(token.balance_formatted).toFixed(4)}{" "}
                             {token.symbol && token.symbol.length <= 5
                               ? token.symbol
@@ -302,6 +302,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             token={selectedToken}
             logoUrls={logoUrls}
             seedPhrase={seedPhrase}
+            selectedChain={selectedChain}
             />
           )}
         </Modal>

@@ -1,7 +1,7 @@
 // hooks/useFetchTokensAndNfts.ts
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { fetchLogo } from "../utils/fetchLogo";
+import { fetchLogo } from "./fetchLogo";
 
 export interface Tokens {
   token_address: string;

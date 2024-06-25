@@ -91,10 +91,10 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
               />
             </DrawerClose>
             <DrawerTitle className="py-3 ml-6 mr-1 font-semibold text-offwhite">
-                {nft.metadata.name.length > 19
-                  ? `${nft.metadata.name.slice(0, 19)}...`
-                  : nft.metadata.name}
-                <span className="text-lightgrey"> x{nft.amount}</span>
+              {nft.metadata.name.length > 19
+                ? `${nft.metadata.name.slice(0, 19)}...`
+                : nft.metadata.name}
+              <span className="text-lightgrey"> x{nft.amount}</span>
             </DrawerTitle>
             <DrawerDescription>
               {" "}
@@ -106,6 +106,7 @@ const NftCard: React.FC<NftCardProps> = ({ nft }) => {
             </DrawerDescription>
           </DrawerHeader>
           <Textarea
+            id="SendAddress"
             className="bg-blackest resize-none min-h-[60px] h-16 text-offwhite border-lightgrey focus:border-sky"
             placeholder="Recipient's address"
           />

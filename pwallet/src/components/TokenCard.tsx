@@ -11,11 +11,14 @@ import { Cross1Icon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { sendTransaction } from "../utils/sendTransaction.ts";
 import useClipboard from '../utils/useClipboard';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { CHAINS_CONFIG, ChainKey } from '../utils/chains';
+import { ethers } from "ethers";
 
 interface TokenCardProps {
   token: Tokens;
   logoUrls: { [symbol: string]: string };
   seedPhrase: string;
+  selectedChain: ChainKey;
 }
 
 interface TransactionReceipt {
@@ -27,7 +30,7 @@ interface TransactionReceipt {
   total: string;
 }
 
-  const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase }) => {
+  const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain }) => {
     const [amountToSend, setAmountToSend] = useState<string>("");
     const [sendToAddress, setSendToAddress] = useState<string>("");
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -38,7 +41,7 @@ interface TransactionReceipt {
     const handleSendTransaction = async () => {
       setIsProcessing(true);
       try {
-        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend);
+        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend, selectedChain);
         if (receipt) {
 
           setTransactionReceipt(receipt as TransactionReceipt);
@@ -117,7 +120,7 @@ interface TransactionReceipt {
                 style={{ cursor: "pointer" }}
               />
             </DrawerClose>
-            <DrawerTitle className="pt-3 pb-2 scroll-m-20 text-xl font-semibold text-offwhite truncate">
+            <DrawerTitle className="pt-3 pb-2 scroll-m-20 text-xl text-center font-semibold text-offwhite truncate">
               {token.name.length > 19
                 ? `${token.name.slice(0, 19)}...`
                 : token.name}
@@ -132,16 +135,19 @@ interface TransactionReceipt {
             </DrawerDescription>
           </DrawerHeader>
           <Textarea
+            id="SendAddress"
             className="bg-blackest resize-none min-h-[60px] h-16 mb-3 text-offwhite border-lightgrey focus:border-sky"
             value={sendToAddress}
             onChange={(e) => setSendToAddress(e.target.value)}
             placeholder="Recipient's address"
           />
           <Input
+            id="SendAmount"
             className="bg-blackest resize-none h-10 min-h-[40px] text-offwhite border-lightgrey focus:border-sky"
             value={amountToSend}
             onChange={(e) => setAmountToSend(e.target.value)}
             placeholder="Amount to send"
+            type="number"
           />
           <DrawerFooter className="flex flex-row w-full gap-4 p-0 mt-4">
             <DrawerClose asChild>
@@ -152,7 +158,12 @@ interface TransactionReceipt {
             <Button
               className="w-1/2 bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm"
               onClick={handleSendTransaction}
-              disabled={isProcessing}
+              disabled={
+                isProcessing ||
+                ethers.isAddress( sendToAddress ) === false ||
+                amountToSend.length === 0 ||
+                parseFloat(amountToSend) <= 0
+              }
             >
               Send
             </Button>
@@ -220,7 +231,7 @@ interface TransactionReceipt {
                 </CardTitle>
                 <CardDescription className="col-span-4 font-normal text-base text-right text-sky truncate">
                   <a
-                    href={`https://sepolia.etherscan.io/tx/${transactionReceipt?.hash}`}
+                    href={`${CHAINS_CONFIG[selectedChain].scanUrl}${transactionReceipt?.hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
