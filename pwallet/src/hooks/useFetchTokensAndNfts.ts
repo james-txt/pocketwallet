@@ -42,6 +42,7 @@ interface FetchResult {
   nfts: Nfts[];
   fetching: boolean;
   logoUrls: { [symbol: string]: string };
+  refetch: () => void;
 }
 
 const useFetchTokensAndNfts = (
@@ -69,7 +70,6 @@ const useFetchTokensAndNfts = (
       }
       setTokens(response.tokens);
 
-      // Fetch logos for each token
       const newLogoUrls = await Promise.all(
         response.tokens.map(async (token: Tokens) => {
           const logoUrl = await fetchLogo(token.symbol);
@@ -95,7 +95,7 @@ const useFetchTokensAndNfts = (
     getAccountTokens();
   }, [getAccountTokens, selectedChain, wallet]);
 
-  return { tokens, nfts, fetching, logoUrls };
+  return { tokens, nfts, fetching, logoUrls, refetch: getAccountTokens};
 };
 
 export default useFetchTokensAndNfts;

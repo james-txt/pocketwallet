@@ -34,7 +34,7 @@ export async function sendTransaction(
     const provider = ethers.getDefaultProvider(chain.rpcUrl);
     const wallet = ethers.Wallet.fromPhrase(seedPhrase).connect(provider);
     // const tokenAddress = new ethers.Contract(tokenAddress, wallet);
-    const amountInWei = ethers.parseEther(amountToSend);
+    const amountInWei = ethers.parseUnits(amountToSend);
 
     const tx = {
       to: sendToAddress,

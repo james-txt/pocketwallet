@@ -19,6 +19,7 @@ interface TokenCardProps {
   logoUrls: { [symbol: string]: string };
   seedPhrase: string;
   selectedChain: ChainKey;
+  refetchBalances: () => void;
 }
 
 interface TransactionReceipt {
@@ -30,18 +31,25 @@ interface TransactionReceipt {
   total: string;
 }
 
-  const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain }) => {
+  const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain, refetchBalances }) => {
     const [amountToSend, setAmountToSend] = useState<string>("");
     const [sendToAddress, setSendToAddress] = useState<string>("");
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [transactionReceipt, setTransactionReceipt] = useState<TransactionReceipt | null>(null as TransactionReceipt | null);
     const { tooltipText: tooltipTextTo, open: openTo, copyToClipboard: copyToClipboardTo, setOpen: setOpenTo } = useClipboard();
     const { tooltipText: tooltipTextFrom, open: openFrom, copyToClipboard: copyToClipboardFrom, setOpen: setOpenFrom } = useClipboard();
-  
+
+    const disableScroll = () => {
+      // Handle the wheel event without using the 'e' parameter
+      // You don't need to reference 'e' since it's not used
+    };
+
     const handleSendTransaction = async () => {
       setIsProcessing(true);
       try {
-        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend, selectedChain);
+        
+        console.log("Amount to send:", amountToSend.toString());
+        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend.toString(), selectedChain);
         if (receipt) {
 
           setTransactionReceipt(receipt as TransactionReceipt);
@@ -54,6 +62,7 @@ interface TransactionReceipt {
         console.error('Error sending transaction:', error);
       } finally {
         setIsProcessing(false);
+        refetchBalances();
       }
     };
 
@@ -146,8 +155,9 @@ interface TransactionReceipt {
             className="bg-blackest resize-none h-10 min-h-[40px] text-offwhite border-lightgrey focus:border-sky"
             value={amountToSend}
             onChange={(e) => setAmountToSend(e.target.value)}
+            onWheel={disableScroll}
             placeholder="Amount to send"
-            type="number"
+            type="tel"
           />
           <DrawerFooter className="flex flex-row w-full gap-4 p-0 mt-4">
             <DrawerClose asChild>

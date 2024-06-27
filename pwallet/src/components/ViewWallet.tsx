@@ -28,7 +28,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
   const [selectedNft, setSelectedNft] = useState<Nfts | null>(null);
   const [selectedToken, setSelectedToken] = useState<Tokens | null>(null);
 
-  const { tokens, nfts, fetching, logoUrls } = useFetchTokensAndNfts(
+  const { tokens, nfts, fetching, logoUrls, refetch } = useFetchTokensAndNfts(
     wallet,
     selectedChain
   );
@@ -67,6 +67,14 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
   const totalNetworth = parseFloat(calculateTotalNetworth(tokens).toFixed(2));
   const totalNetworth24hrUsdChange = parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2));
   const totalNetworth24hrPctChange = parseFloat(calculateNetworth24hrPctChange(tokens).toFixed(2));
+
+  const refetchBalances = () => {
+    if (refetch) {
+      refetch();
+      setTimeout(() => {
+      }, 1000);
+    }
+  };
 
   return (
     <div className="content">
@@ -303,6 +311,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             logoUrls={logoUrls}
             seedPhrase={seedPhrase}
             selectedChain={selectedChain}
+            refetchBalances={refetchBalances}
             />
           )}
         </Modal>

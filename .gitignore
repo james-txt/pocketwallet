@@ -4,3 +4,4 @@ backend/getTokens.jsonbak
 node_modules
 backend/getTokens.jsonbakk
 *.env
+.vscode
