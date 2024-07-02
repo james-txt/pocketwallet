@@ -76,6 +76,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
     }
   };
 
+  
   return (
     <div className="content">
       <Tabs
@@ -322,6 +323,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
         </Modal>
       )}
     </div>
+    
   );
 };
 

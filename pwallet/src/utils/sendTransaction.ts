@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { CHAINS_CONFIG , ChainKey} from './chains';
+import { CHAINS_CONFIG, ChainKey } from './chains';
 
 interface ChainConfig {
   hex: string;
@@ -12,57 +12,101 @@ interface Receipt {
   hash: string;
   to: string | null;
   from: string;
-  gasPrice: string;
-  total: string;
+  txFee: string;
+  amount: string;
   status: number | null;
 }
 
 const Receipt: Receipt | null = null;
 
 export async function sendTransaction(
-  seedPhrase: string, 
-  sendToAddress: string, 
+  seedPhrase: string,
+  sendToAddress: string,
   amountToSend: string,
   selectedChain: ChainKey,
-) {
+  token: { token_address: string, native_token: boolean }
+): Promise<Receipt | null> {
   try {
     const chain: ChainConfig = CHAINS_CONFIG[selectedChain];
     if (!chain) {
       throw new Error(`Unsupported chain: ${selectedChain}`);
     }
 
-    const provider = ethers.getDefaultProvider(chain.rpcUrl);
+    const provider = new ethers.JsonRpcProvider(chain.rpcUrl);
     const wallet = ethers.Wallet.fromPhrase(seedPhrase).connect(provider);
-    // const tokenAddress = new ethers.Contract(tokenAddress, wallet);
-    const amountInWei = ethers.parseUnits(amountToSend);
+    const amountInWei = ethers.parseUnits(amountToSend, 18);
 
-    const tx = {
-      to: sendToAddress,
-      value: amountInWei,
-    };
+    let txResponse;
+    let transferToAddress: string | null = null;
+    let transferAmount: string | null = null;
 
-    const txResponse = await wallet.sendTransaction(tx);
+    if (token.native_token) {
+      // Send native token transaction
+      txResponse = await wallet.sendTransaction({
+        to: sendToAddress,
+        value: amountInWei,
+      });
+    } else {
+      // Send ERC-20 token transaction
+      const tokenContract = new ethers.Contract(token.token_address, [
+        "function transfer(address to, uint amount) public returns (bool)",
+        "event Transfer(address indexed from, address indexed to, uint256 value)",
+      ], wallet);
 
-    console.log('Transaction Response:', txResponse);
+      txResponse = await tokenContract.transfer(sendToAddress, amountInWei);
+    }
+
+    console.log("Transaction Response:", txResponse);
 
     const txReceipt = await txResponse.wait();
-    
     console.log('Transaction Receipt:', txReceipt);
-    
-    if (txReceipt) {
-      return {
-        hash: txReceipt.hash, 
-        to: txReceipt.to, 
-        from: txReceipt.from,
-        gasPrice: parseFloat(ethers.formatEther(txReceipt.fee)).toFixed(4),
-        total: (parseFloat(ethers.formatEther(txReceipt.fee)) + parseFloat(amountToSend)).toFixed(4),
-        status: txReceipt.status
+
+    if (!token.native_token) {
+      // Fetch logs for ERC-20 token transaction
+      const filter = {
+        address: token.token_address,
+        fromBlock: txReceipt.blockNumber,
+        toBlock: txReceipt.blockNumber,
+        topics: [ethers.id("Transfer(address,address,uint256)")],
       };
-    } else {
-      throw new Error('Transaction receipt is null.');
+
+      const logs = await provider.getLogs(filter);
+      const tokenContract = new ethers.Contract(token.token_address, [
+        "event Transfer(address indexed from, address indexed to, uint256 value)",
+      ], wallet);
+
+      const transferEvent = logs
+        .map((log: ethers.Log) => {
+          try {
+            return tokenContract.interface.parseLog(log);
+          } catch (e) {
+            return null;
+          }
+        })
+        .find((log) => log && log.name === 'Transfer');
+
+      if (transferEvent) {
+        transferToAddress = transferEvent.args.to;
+        transferAmount = ethers.formatUnits(transferEvent.args.value, 18);
+        console.log(`Transfer event: 
+        from ${transferEvent.args.from} 
+        to ${transferEvent.args.to} 
+        value ${ethers.formatUnits(transferEvent.args.value, 18)}`);
+      } else {
+        console.warn('Transfer event not found in logs.');
+      }
     }
-  }
-  catch (error) {
+
+
+    return {
+      hash: txReceipt.hash,
+      to: transferToAddress || txReceipt.to,
+      from: txReceipt.from,
+      txFee: parseFloat(ethers.formatEther(txReceipt.fee)).toFixed(4),
+      amount: transferAmount || parseFloat(ethers.formatEther(txResponse.value + txReceipt.fee)).toFixed(4),
+      status: txReceipt.status,
+    };
+  } catch (error) {
     console.error('Error sending transaction:', error);
     return null;
   }

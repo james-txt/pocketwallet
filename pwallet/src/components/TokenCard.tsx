@@ -25,10 +25,11 @@ interface TokenCardProps {
 interface TransactionReceipt {
   hash: string;
   from: string;
-  gasPrice: string;
+  txFee: string;
   status: number;
   to: string;
   total: string;
+  amount: string;
 }
 
   const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain, refetchBalances }) => {
@@ -39,17 +40,10 @@ interface TransactionReceipt {
     const { tooltipText: tooltipTextTo, open: openTo, copyToClipboard: copyToClipboardTo, setOpen: setOpenTo } = useClipboard();
     const { tooltipText: tooltipTextFrom, open: openFrom, copyToClipboard: copyToClipboardFrom, setOpen: setOpenFrom } = useClipboard();
 
-    const disableScroll = () => {
-      // Handle the wheel event without using the 'e' parameter
-      // You don't need to reference 'e' since it's not used
-    };
-
     const handleSendTransaction = async () => {
       setIsProcessing(true);
       try {
-        
-        console.log("Amount to send:", amountToSend.toString());
-        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend.toString(), selectedChain);
+        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend.toString(), selectedChain, { token_address: token.token_address, native_token: token.native_token  });
         if (receipt) {
 
           setTransactionReceipt(receipt as TransactionReceipt);
@@ -57,12 +51,13 @@ interface TransactionReceipt {
   
           setAmountToSend("");
           setSendToAddress("");
+          refetchBalances();
         }
       } catch (error) {
         console.error('Error sending transaction:', error);
       } finally {
         setIsProcessing(false);
-        refetchBalances();
+        
       }
     };
 
@@ -112,7 +107,7 @@ interface TransactionReceipt {
           <CardTitle className="text-base font-semibold text-lightgrey tracking-wide pb-1">
             Address:
           </CardTitle>
-          <CardDescription className="text-amber tracking-tight opacity-80">
+          <CardDescription className="text-amber tracking-tighter opacity-80">
             {token.token_address}
           </CardDescription>
         </CardContent>
@@ -122,18 +117,19 @@ interface TransactionReceipt {
           Send
         </DrawerTrigger>
         <DrawerContent className="modal z-10 top-[-32px] h-full rounded-none border-lightgrey bg-blacker">
-          <DrawerHeader className="p-0">
-            <DrawerClose className="absolute">
+          <DrawerHeader className="grid p-0">
+            <DrawerClose className="absolute col-span-1 ml-1.5">
               <Cross1Icon
-                className="z-10 absolute top-4 right-[70px] h-6 w-6 text-lightgrey hover:text-offwhite transition-colors duration-200 ease-in-out"
+                className="z-10 absolute top-4 left-[-94px] h-6 w-6 text-lightgrey hover:text-offwhite transition-colors duration-200 ease-in-out"
                 style={{ cursor: "pointer" }}
               />
             </DrawerClose>
-            <DrawerTitle className="pt-3 pb-2 scroll-m-20 text-xl text-center font-semibold text-offwhite truncate">
+            <DrawerTitle className="col-span-3 -ml-3 pt-3 pb-2 scroll-m-20 text-xl text-center font-semibold text-offwhite truncate">
               {token.name.length > 19
                 ? `${token.name.slice(0, 19)}...`
                 : token.name}
             </DrawerTitle>
+
             <DrawerDescription>
               {" "}
               <img
@@ -155,9 +151,9 @@ interface TransactionReceipt {
             className="bg-blackest resize-none h-10 min-h-[40px] text-offwhite border-lightgrey focus:border-sky"
             value={amountToSend}
             onChange={(e) => setAmountToSend(e.target.value)}
-            onWheel={disableScroll}
+            onWheel={(event) => event.currentTarget.blur()}
             placeholder="Amount to send"
-            type="tel"
+            type="number"
           />
           <DrawerFooter className="flex flex-row w-full gap-4 p-0 mt-4">
             <DrawerClose asChild>
@@ -170,7 +166,7 @@ interface TransactionReceipt {
               onClick={handleSendTransaction}
               disabled={
                 isProcessing ||
-                ethers.isAddress( sendToAddress ) === false ||
+                ethers.isAddress(sendToAddress) === false ||
                 amountToSend.length === 0 ||
                 parseFloat(amountToSend) <= 0
               }
@@ -266,18 +262,21 @@ interface TransactionReceipt {
               </CardContent>
               <CardContent className="p-4 py-2 border-b-2 border-blacker grid grid-cols-4 justify-between">
                 <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
-                  Gas Price:
+                  Transaction Fee:
                 </CardTitle>
                 <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
-                  {transactionReceipt?.gasPrice}
+                  {transactionReceipt?.txFee} {CHAINS_CONFIG[selectedChain].symbol}
                 </CardDescription>
               </CardContent>
               <CardContent className="p-4 py-2 border-b-2 border-blacker grid grid-cols-4 justify-between">
                 <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
-                  Total Cost:
+                  Token Amount:
                 </CardTitle>
                 <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
-                  {transactionReceipt?.total}
+                  <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
+                    {transactionReceipt?.amount &&
+                      `${transactionReceipt?.amount} ${token.symbol}`}
+                  </CardDescription>
                 </CardDescription>
               </CardContent>
             </Card>
