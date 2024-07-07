@@ -102,8 +102,8 @@ export async function sendTransaction(
       hash: txReceipt.hash,
       to: transferToAddress || txReceipt.to,
       from: txReceipt.from,
-      txFee: parseFloat(ethers.formatEther(txReceipt.fee)).toFixed(4),
-      amount: transferAmount || parseFloat(ethers.formatEther(txResponse.value + txReceipt.fee)).toFixed(4),
+      txFee: parseFloat(ethers.formatEther(txReceipt.fee)).toFixed(5),
+      amount: transferAmount || parseFloat(ethers.formatEther(txResponse.value + txReceipt.fee)).toFixed(5),
       status: txReceipt.status,
     };
   } catch (error) {

@@ -54,6 +54,12 @@ const useFetchTokensAndNfts = (
   const [fetching, setFetching] = useState(false);
   const [logoUrls, setLogoUrls] = useState<{ [symbol: string]: string }>({});
 
+  const transformNftImageUrl = (url: string) => {
+    return url.startsWith('ipfs://')
+      ? 'https://ipfs.io/ipfs/' + url.slice(7)
+      : url;
+  };
+
   const getAccountTokens = useCallback(async () => {
     setFetching(true);
     try {
@@ -65,9 +71,15 @@ const useFetchTokensAndNfts = (
       });
       const response = res.data;
       console.log(response);
-      if (response.nfts.length > 0) {
-        setNfts(response.nfts);
-      }
+      const transformedNfts = response.nfts.map((nft: Nfts) => ({
+        ...nft,
+        metadata: {
+          ...nft.metadata,
+          image: transformNftImageUrl(nft.metadata.image),
+        },
+      }));
+
+      setNfts(transformedNfts);
       setTokens(response.tokens);
 
       const newLogoUrls = await Promise.all(

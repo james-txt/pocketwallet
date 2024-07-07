@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardIcon, ActivityLogIcon } from "@radix-ui/react-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,12 +21,11 @@ interface ViewWalletProps {
 }
 
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhrase }) => {
-  const [isNftModalOpen, setIsNftModalOpen] = useState(false);
-  const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<"nft" | "token" | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Nfts | Tokens | null>(null);
   const [currentTab, setCurrentTab] = useState("tokenTab");
   const [fadeClass, setFadeClass] = useState("fade-in-left");
-  const [selectedNft, setSelectedNft] = useState<Nfts | null>(null);
-  const [selectedToken, setSelectedToken] = useState<Tokens | null>(null);
 
   const { tokens, nfts, fetching, logoUrls, refetch } = useFetchTokensAndNfts(
     wallet,
@@ -38,31 +37,24 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
     setTimeout(() => {
       setCurrentTab(value);
       setFadeClass("fade-in-left");
+      closeModal();
     }, 100);
   };
-
-  const openModal = (modalType: "nft" | "token", item: Nfts | Tokens | null = null) => {
-    setFadeClass("fade-in");
-    if (modalType === "nft") {
-      setSelectedNft(item as Nfts);
-      setIsNftModalOpen(true);
-    } else if (modalType === "token") {
-      setSelectedToken(item as Tokens);
-      setIsTokenModalOpen(true);
-    }
+  const openModal = (type: "nft" | "token", item: Nfts | Tokens | null = null) => {
+    setSelectedItem(item);
+    setModalType(type);
+    setIsModalOpen(true);
   };
-  
 
-  const closeModal = (modalType: "nft" | "token") => {
-    setFadeClass("fade-out");
-    setTimeout(() => {
-      if (modalType === "nft") {
-        setIsNftModalOpen(false);
-      } else if (modalType === "token") {
-        setIsTokenModalOpen(false);
-      }
-    }, 100);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+    setModalType(null);
   };
+
+  useEffect(() => {
+    closeModal();
+  }, [selectedChain]);
 
   const totalNetworth = parseFloat(calculateTotalNetworth(tokens).toFixed(2));
   const totalNetworth24hrUsdChange = parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2));
@@ -304,26 +296,24 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
           </TabsTrigger>
         </TabsList>
       </Tabs>
-      {currentTab === "tokenTab" && (
-        <Modal isOpen={isTokenModalOpen} onClose={() => closeModal("token")}>
-          {selectedToken && (
-            <TokenCard 
-            token={selectedToken}
+      {isModalOpen && modalType && selectedItem && (
+        <Modal isOpen={isModalOpen} onClose={closeModal}>
+          {modalType === "nft" && 
+          <NftCard 
+          nft={selectedItem as Nfts}
+           />}
+          {modalType === "token" &&             
+          <TokenCard 
+            token={selectedItem as Tokens}
             logoUrls={logoUrls}
             seedPhrase={seedPhrase}
             selectedChain={selectedChain}
             refetchBalances={refetchBalances}
-            />
-          )}
-        </Modal>
-      )}
-      {currentTab === "nftTab" && (
-        <Modal isOpen={isNftModalOpen} onClose={() => closeModal("nft")}>
-          {selectedNft && <NftCard nft={selectedNft} />}
+            closeModal={closeModal}
+          />}
         </Modal>
       )}
     </div>
-    
   );
 };
 

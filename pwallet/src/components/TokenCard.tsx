@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tokens } from "../hooks/useFetchTokensAndNfts";
 import noneLogo from "../assets/none.png";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Cross1Icon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { sendTransaction } from "../utils/sendTransaction.ts";
+import { fetchGasPrice } from '../utils/gasPrice.ts';
 import useClipboard from '../utils/useClipboard';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CHAINS_CONFIG, ChainKey } from '../utils/chains';
@@ -20,6 +21,7 @@ interface TokenCardProps {
   seedPhrase: string;
   selectedChain: ChainKey;
   refetchBalances: () => void;
+  closeModal: () => void;
 }
 
 interface TransactionReceipt {
@@ -32,13 +34,34 @@ interface TransactionReceipt {
   amount: string;
 }
 
-  const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain, refetchBalances }) => {
+  const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain, refetchBalances, closeModal }) => {
     const [amountToSend, setAmountToSend] = useState<string>("");
     const [sendToAddress, setSendToAddress] = useState<string>("");
+    const [gasPrice, setGasPrice] = useState<string>('0');
+    const [isFetchingGasPrice, setIsFetchingGasPrice] = useState<boolean>(false);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [transactionReceipt, setTransactionReceipt] = useState<TransactionReceipt | null>(null as TransactionReceipt | null);
     const { tooltipText: tooltipTextTo, open: openTo, copyToClipboard: copyToClipboardTo, setOpen: setOpenTo } = useClipboard();
     const { tooltipText: tooltipTextFrom, open: openFrom, copyToClipboard: copyToClipboardFrom, setOpen: setOpenFrom } = useClipboard();
+
+    useEffect(() => {
+      const chain = CHAINS_CONFIG[selectedChain];
+      if (chain) {
+        const updateGasPrice = async () => {
+          setIsFetchingGasPrice(true);
+
+          setTimeout(async () => {
+            const newGasPrice = await fetchGasPrice(chain.rpcUrl);
+            setGasPrice(newGasPrice);
+            setIsFetchingGasPrice(false);
+          }, 1000);
+        };
+  
+        updateGasPrice();
+        const interval = setInterval(updateGasPrice, 10000);
+        return () => clearInterval(interval);
+      }
+    }, [selectedChain]);
 
     const handleSendTransaction = async () => {
       setIsProcessing(true);
@@ -116,9 +139,12 @@ interface TransactionReceipt {
         <DrawerTrigger className="mb-8 mt-4 w-full h-9 rounded-md px-4 py-2 inline-flex items-center justify-center whitespace-nowrap bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm">
           Send
         </DrawerTrigger>
-        <DrawerContent className="modal z-10 top-[-32px] h-full rounded-none border-lightgrey bg-blacker">
+        <DrawerContent className="modal z-10 top-[-32px] h-[700px] rounded-none border-lightgrey bg-blacker">
           <DrawerHeader className="grid p-0">
-            <DrawerClose className="absolute col-span-1 ml-1.5">
+            <DrawerClose
+              className="absolute col-span-1 ml-1.5"
+              onClick={closeModal}
+            >
               <Cross1Icon
                 className="z-10 absolute top-4 left-[-94px] h-6 w-6 text-lightgrey hover:text-offwhite transition-colors duration-200 ease-in-out"
                 style={{ cursor: "pointer" }}
@@ -155,9 +181,26 @@ interface TransactionReceipt {
             placeholder="Amount to send"
             type="number"
           />
+          {isFetchingGasPrice ? (
+            <Skeleton className="w-[320px] h-10 mt-4 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none" />
+          ) : (
+            <Card className="w-[320px] mt-4 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none">
+              <CardContent className="grid grid-cols-4 p-4 py-2 border-blacker">
+                <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
+                  Estimated Fee:
+                </CardTitle>
+                <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
+                  {gasPrice} {CHAINS_CONFIG[selectedChain].symbol}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          )}
           <DrawerFooter className="flex flex-row w-full gap-4 p-0 mt-4">
             <DrawerClose asChild>
-              <Button className="w-1/2 bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm">
+              <Button
+                className="w-1/2 bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm"
+                onClick={closeModal}
+              >
                 Cancel
               </Button>
             </DrawerClose>
@@ -168,7 +211,10 @@ interface TransactionReceipt {
                 isProcessing ||
                 ethers.isAddress(sendToAddress) === false ||
                 amountToSend.length === 0 ||
-                parseFloat(amountToSend) <= 0
+                parseFloat(amountToSend) <= 0 ||
+                parseFloat(amountToSend) > parseFloat(token.balance_formatted) ||
+                parseFloat(gasPrice) <= 0 ||
+                isFetchingGasPrice
               }
             >
               Send
@@ -204,7 +250,7 @@ interface TransactionReceipt {
                       alignOffset={-20}
                       className="bg-char border-none shadow-sm shadow-blackest"
                     >
-                      <p>{tooltipTextFrom}</p>
+                      {tooltipTextFrom}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -226,7 +272,7 @@ interface TransactionReceipt {
                       alignOffset={-20}
                       className="bg-char border-none shadow-sm shadow-blackest"
                     >
-                      <p>{tooltipTextTo}</p>
+                      {tooltipTextTo}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -264,19 +310,18 @@ interface TransactionReceipt {
                 <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
                   Transaction Fee:
                 </CardTitle>
-                <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
-                  {transactionReceipt?.txFee} {CHAINS_CONFIG[selectedChain].symbol}
+                <CardDescription className="col-span-2 font-normal text-base text-right text-red-500 truncate">
+                  {`- ${transactionReceipt?.txFee}`}{" "}
+                  {CHAINS_CONFIG[selectedChain].symbol}
                 </CardDescription>
               </CardContent>
               <CardContent className="p-4 py-2 border-b-2 border-blacker grid grid-cols-4 justify-between">
                 <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
                   Token Amount:
                 </CardTitle>
-                <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
-                  <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
-                    {transactionReceipt?.amount &&
-                      `${transactionReceipt?.amount} ${token.symbol}`}
-                  </CardDescription>
+                <CardDescription className="col-span-2 font-normal text-base text-right text-red-500 truncate">
+                  {transactionReceipt?.amount &&
+                    `- ${transactionReceipt?.amount} ${token.symbol}`}
                 </CardDescription>
               </CardContent>
             </Card>
