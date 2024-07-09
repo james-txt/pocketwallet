@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Tokens } from "../hooks/useFetchTokensAndNfts";
 import noneLogo from "../assets/none.png";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Cross1Icon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { sendTransaction } from "../utils/sendTransaction.ts";
-import { fetchGasPrice } from '../utils/gasPrice.ts';
 import useClipboard from '../utils/useClipboard';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { CHAINS_CONFIG, ChainKey } from '../utils/chains';
+import { CHAINS_CONFIG, ChainKey } from '../utils/chains.ts';
 import { ethers } from "ethers";
+import { useGasPrice } from "../utils/useGasPrice.ts";
 
 interface TokenCardProps {
   token: Tokens;
@@ -37,36 +37,23 @@ interface TransactionReceipt {
   const TokenCard: React.FC<TokenCardProps> = ({ token, logoUrls, seedPhrase, selectedChain, refetchBalances, closeModal }) => {
     const [amountToSend, setAmountToSend] = useState<string>("");
     const [sendToAddress, setSendToAddress] = useState<string>("");
-    const [gasPrice, setGasPrice] = useState<string>('0');
-    const [isFetchingGasPrice, setIsFetchingGasPrice] = useState<boolean>(false);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [transactionReceipt, setTransactionReceipt] = useState<TransactionReceipt | null>(null as TransactionReceipt | null);
     const { tooltipText: tooltipTextTo, open: openTo, copyToClipboard: copyToClipboardTo, setOpen: setOpenTo } = useClipboard();
     const { tooltipText: tooltipTextFrom, open: openFrom, copyToClipboard: copyToClipboardFrom, setOpen: setOpenFrom } = useClipboard();
+    const gasLimit = 21000;
 
-    useEffect(() => {
-      const chain = CHAINS_CONFIG[selectedChain];
-      if (chain) {
-        const updateGasPrice = async () => {
-          setIsFetchingGasPrice(true);
-
-          setTimeout(async () => {
-            const newGasPrice = await fetchGasPrice(chain.rpcUrl);
-            setGasPrice(newGasPrice);
-            setIsFetchingGasPrice(false);
-          }, 1000);
-        };
-  
-        updateGasPrice();
-        const interval = setInterval(updateGasPrice, 10000);
-        return () => clearInterval(interval);
-      }
-    }, [selectedChain]);
+    const { gasPrice, isFetchingGasPrice } = useGasPrice(selectedChain, isProcessing, gasLimit); 
 
     const handleSendTransaction = async () => {
       setIsProcessing(true);
       try {
-        const receipt = await sendTransaction(seedPhrase, sendToAddress, amountToSend.toString(), selectedChain, { token_address: token.token_address, native_token: token.native_token  });
+        const receipt = await sendTransaction(seedPhrase, 
+          sendToAddress, 
+          amountToSend.toString(), 
+          selectedChain, 
+          { token_address: token.token_address, 
+            native_token: token.native_token  });
         if (receipt) {
 
           setTransactionReceipt(receipt as TransactionReceipt);

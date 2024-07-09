@@ -301,6 +301,11 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
           {modalType === "nft" && 
           <NftCard 
           nft={selectedItem as Nfts}
+          token={selectedItem as Tokens}
+          seedPhrase={seedPhrase}
+          selectedChain={selectedChain}
+          refetchBalances={refetchBalances}
+          closeModal={closeModal}
            />}
           {modalType === "token" &&             
           <TokenCard 

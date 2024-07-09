@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { fetchLogo } from "./fetchLogo";
+import noneLogo from "../assets/none.png";
 
 export interface Tokens {
   token_address: string;
@@ -25,6 +26,8 @@ export interface Tokens {
 
 export interface Nfts {
   amount: number;
+  contractType: string;
+  tokenAddress: string;
   metadata: {
     name: string;
     image: string;
@@ -34,7 +37,7 @@ export interface Nfts {
       value: string;
     }>;
   };
-  tokenId: number;
+  tokenId: string;
 }
 
 interface FetchResult {
@@ -75,7 +78,7 @@ const useFetchTokensAndNfts = (
         ...nft,
         metadata: {
           ...nft.metadata,
-          image: transformNftImageUrl(nft.metadata.image),
+          image: nft.metadata.image ? transformNftImageUrl(nft.metadata.image) : noneLogo,
         },
       }));
 
