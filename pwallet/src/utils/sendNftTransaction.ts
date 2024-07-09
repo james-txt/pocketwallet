@@ -56,8 +56,8 @@ export async function sendNftTransaction(
         if (!amountToSend) {
           throw new Error('Amount must be provided for ERC-1155 token transfers.');
         }
-        const amountInUnits = ethers.parseUnits(amountToSend, 18);
-        txResponse = await tokenContract.safeTransferFrom(wallet.address, sendToAddress, nft.tokenId, amountInUnits, '0x');
+        
+        txResponse = await tokenContract.safeTransferFrom(wallet.address, sendToAddress, nft.tokenId, ethers.toBigInt(amountToSend), '0x');
         transferAmount = amountToSend;
         break;
       }
@@ -96,16 +96,16 @@ export async function sendNftTransaction(
       ? transferEvent?.args.to || sendToAddress
       : sendToAddress;
 
-    return {
-      hash: txReceipt.hash,
-      to: transferToAddress,
-      from: txReceipt.from,
-      txFee: parseFloat(ethers.formatEther(txReceipt.fee)).toFixed(5),
-      amount: transferAmount || "0",
-      status: txReceipt.status,
-    };
-  } catch (error) {
-    console.error('Error sending token transaction:', error);
-    return null;
+      return {
+        hash: txReceipt.hash,
+        to: transferToAddress,
+        from: txReceipt.from,
+        txFee: parseFloat(ethers.formatEther(txReceipt.fee)).toFixed(5),
+        amount: transferAmount || "0",
+        status: txReceipt.status,
+      };
+    } catch (error) {
+      console.error('Error sending token transaction:', error);
+      return null;
+    }
   }
-}

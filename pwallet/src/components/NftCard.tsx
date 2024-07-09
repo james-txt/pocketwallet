@@ -40,9 +40,9 @@ const NftCard: React.FC<NftCardProps> = ({ nft, token, seedPhrase, selectedChain
   const [transactionReceipt, setTransactionReceipt] = useState<TransactionReceipt | null>(null);
   const { tooltipText: tooltipTextTo, open: openTo, copyToClipboard: copyToClipboardTo, setOpen: setOpenTo } = useClipboard();
   const { tooltipText: tooltipTextFrom, open: openFrom, copyToClipboard: copyToClipboardFrom, setOpen: setOpenFrom } = useClipboard();
-  const gasLimit = 93943;
 
-  const { gasPrice, isFetchingGasPrice } = useGasPrice(selectedChain, isProcessing, gasLimit); 
+  const gasLimit = nft.contractType === 'ERC1155' ? 50400 : 93943;
+  const { gasPrice, isFetchingGasPrice } = useGasPrice(selectedChain, isProcessing, gasLimit);
 
   const handleSendNftTransaction = async () => {
     setIsProcessing(true);
@@ -62,7 +62,9 @@ const NftCard: React.FC<NftCardProps> = ({ nft, token, seedPhrase, selectedChain
   
   
         setSendToAddress("");
-        refetchBalances();
+        setTimeout(() => {
+          refetchBalances();
+        }, 1000); 
       }
     } catch (error) {
       console.error('Error sending transaction:', error);
@@ -183,17 +185,17 @@ const NftCard: React.FC<NftCardProps> = ({ nft, token, seedPhrase, selectedChain
             </DrawerDescription>
           </DrawerHeader>
           <Textarea
-            id="SendAddress"
+            id="sendAddress"
             className="bg-blackest resize-none min-h-[60px] h-16 mb-3 text-offwhite border-lightgrey focus:border-sky"
             value={sendToAddress}
             onChange={(e) => setSendToAddress(e.target.value)}
             placeholder="Recipient's address"
           />
           <Input
-            id="SendAmount"
+            id="sendAmount"
             className="bg-blackest resize-none h-10 min-h-[40px] text-offwhite border-lightgrey focus:border-sky"
-            value={nft.contractType !== 'ERC1155' ? '1' : amountToSend}
-            onChange={(e) => setAmountToSend(e.target.value)}
+            value={nft.contractType !== 'ERC1155' ? '1' : (amountToSend)}
+            onChange={(e) => setAmountToSend((e.target.value))}
             onWheel={(event) => event.currentTarget.blur()}
             placeholder="Amount to send"
             type="number"
@@ -226,7 +228,10 @@ const NftCard: React.FC<NftCardProps> = ({ nft, token, seedPhrase, selectedChain
               className="w-1/2 bg-char font-normal text-offwhite hover:bg-lightgrey shadow-blackest shadow-sm"
               onClick={handleSendNftTransaction}
               disabled={
-                isProcessing || ethers.isAddress(sendToAddress) === false
+                isProcessing || 
+                ethers.isAddress(sendToAddress) === false ||
+                nft.amount <= 0 ||
+                Number(amountToSend) === 0
               }
             >
               Send

@@ -63,8 +63,6 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
   const refetchBalances = () => {
     if (refetch) {
       refetch();
-      setTimeout(() => {
-      }, 1000);
     }
   };
 

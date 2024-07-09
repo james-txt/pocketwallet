@@ -61,7 +61,9 @@ interface TransactionReceipt {
   
           setAmountToSend("");
           setSendToAddress("");
-          refetchBalances();
+          setTimeout(() => {
+            refetchBalances();
+          }, 1000); 
         }
       } catch (error) {
         console.error('Error sending transaction:', error);
