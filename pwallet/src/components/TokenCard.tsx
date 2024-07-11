@@ -209,6 +209,7 @@ interface TransactionReceipt {
               Send
             </Button>
           </DrawerFooter>
+          // Tx Receipt
           {isProcessing ? (
             <Skeleton className="w-[320px] h-12 mt-4 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none" />
           ) : transactionReceipt ? (

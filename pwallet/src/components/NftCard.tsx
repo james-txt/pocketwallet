@@ -237,6 +237,7 @@ const NftCard: React.FC<NftCardProps> = ({ nft, token, seedPhrase, selectedChain
               Send
             </Button>
           </DrawerFooter>
+          // Tx Receipt
           {isProcessing ? (
             <Skeleton className="w-[320px] h-12 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none" />
           ) : transactionReceipt ? (
