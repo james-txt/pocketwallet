@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import Modal from "./Modal";
 import NftCard from "./NftCard";
 import TokenCard from "./TokenCard";
+//import HistoryCard from "./HistoryCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import noneLogo from "../assets/none.png";
 import { calculateTotalNetworth, calculateNetworth24hrUsdChange, calculateNetworth24hrPctChange } from "@/utils/calculateNetworth";
 import useFetchTokensAndNfts from "../hooks/useFetchTokensAndNfts";
-import { Nfts, Tokens } from "../hooks/useFetchTokensAndNfts";
+import { Nfts, Tokens, Historys } from "../hooks/useFetchTokensAndNfts";
 import { ChainKey } from '../utils/chains';
 
 interface ViewWalletProps {
@@ -22,12 +23,12 @@ interface ViewWalletProps {
 
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhrase }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"nft" | "token" | null>(null);
-  const [selectedItem, setSelectedItem] = useState<Nfts | Tokens | null>(null);
+  const [modalType, setModalType] = useState<"nft" | "token" | "history" | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Nfts | Tokens | Historys | null>(null);
   const [currentTab, setCurrentTab] = useState("tokenTab");
   const [fadeClass, setFadeClass] = useState("fade-in-left");
 
-  const { tokens, nfts, fetching, logoUrls, refetch } = useFetchTokensAndNfts(
+  const { tokens, nfts, historys, fetching, logoUrls, refetch } = useFetchTokensAndNfts(
     wallet,
     selectedChain
   );
@@ -40,7 +41,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
       closeModal();
     }, 100);
   };
-  const openModal = (type: "nft" | "token", item: Nfts | Tokens | null = null) => {
+  const openModal = (type: "nft" | "token" | "history", item: Nfts | Tokens | Historys | null = null) => {
     setSelectedItem(item);
     setModalType(type);
     setIsModalOpen(true);
@@ -66,7 +67,6 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
     }
   };
 
-  
   return (
     <div className="content">
       <Tabs
@@ -101,11 +101,11 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         : "text-offwhite"
                   }`}
                 >
-                  {totalNetworth24hrUsdChange > 0.001 
-                    ? `+$${totalNetworth24hrUsdChange.toFixed(2)}` 
-                    : totalNetworth24hrUsdChange < -0.001 
-                    ? `-$${Math.abs(totalNetworth24hrUsdChange).toFixed(2)}`
-                    : "0.00"}
+                  {totalNetworth24hrUsdChange > 0.001
+                    ? `+$${totalNetworth24hrUsdChange.toFixed(2)}`
+                    : totalNetworth24hrUsdChange < -0.001
+                      ? `-$${Math.abs(totalNetworth24hrUsdChange).toFixed(2)}`
+                      : "0.00"}
                 </h3>
               )}
               {fetching ? (
@@ -120,23 +120,20 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         : "text-offwhite"
                   }`}
                 >
-                  {totalNetworth24hrPctChange > 0.001 
-                  ? `+${totalNetworth24hrPctChange.toFixed(2)}%` 
-                  : totalNetworth24hrPctChange < -0.001
-                  ? `${totalNetworth24hrPctChange.toFixed(2)}%`
-                  : "0.00"}
+                  {totalNetworth24hrPctChange > 0.001
+                    ? `+${totalNetworth24hrPctChange.toFixed(2)}%`
+                    : totalNetworth24hrPctChange < -0.001
+                      ? `${totalNetworth24hrPctChange.toFixed(2)}%`
+                      : "0.00"}
                 </h3>
               )}
             </div>
             {fetching ? (
               tokens.map((_, index) => (
-                <Skeleton
-                  key={index}
-                  className="w-full py-8 my-3 bg-char"
-                />
+                <Skeleton key={index} className="w-full py-8 my-3 bg-char" />
               ))
             ) : tokens.length > 0 ? (
-              <div className="">
+              <div>
                 {tokens.map((token, tokenIndex) => (
                   <Button
                     className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
@@ -153,7 +150,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                           className="w-12 h-12"
                         />
                       )}
-                      <div className="">
+                      <div>
                         {fetching ? (
                           <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
                         ) : (
@@ -175,7 +172,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         )}
                       </div>
                     </div>
-                    <div className="">
+                    <div>
                       {fetching ? (
                         <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
                       ) : (
@@ -219,7 +216,10 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             <div className="grid grid-cols-2 gap-2 mt-1 mb-4">
               {fetching ? (
                 Array.from({ length: 8 }).map((_, index) => (
-                  <Skeleton key={index} className="w-full rounded-md h-[156px] bg-blacker" />
+                  <Skeleton
+                    key={index}
+                    className="w-full rounded-md h-[156px] bg-blacker"
+                  />
                 ))
               ) : nfts.length > 0 ? (
                 nfts.map((nft, index) => (
@@ -247,12 +247,104 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             </div>
           </TabsContent>
           <TabsContent
-            value="activityTab"
-            className={`absolute w-full h-full transition-opacity duration-50 ${
-              currentTab === "activityTab" ? fadeClass : "opacity-0"
+            value="historyTab"
+            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
+              currentTab === "historyTab" ? fadeClass : "opacity-0"
             }`}
           >
-            Display activity log of your account here.
+            {fetching ? (
+              historys.map((_, index) => (
+                <Skeleton
+                  key={index}
+                  className="w-full py-8 mt-1 mb-2 bg-char"
+                />
+              ))
+            ) : historys.length > 0 ? (
+              <div>
+                {historys.map((history, historyIndex) => (
+                  <Button
+                    className="w-full h-16 p-2 px-4 mt-1 mb-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
+                    key={historyIndex}
+                    onClick={() => openModal("history", history)}
+                  >
+                    <div className="flex gap-2 place-items-center">
+                      {fetching ? (
+                        <Skeleton className="w-12 h-12 bg-offwhite rounded-full" />
+                      ) : history.contractType === "ERC1155" ||
+                        history.contractType === "ERC721" ||
+                        history.contractType === "ERC721A" ? (
+                        <img
+                          src={history.image}
+                          alt={`${history.tokenSymbol} Logo`}
+                          className="w-12 h-12"
+                        />
+                      ) : (
+                        <img
+                          src={logoUrls[history.tokenSymbol] || noneLogo}
+                          alt={`${history.tokenSymbol} Logo`}
+                          className="w-12 h-12"
+                        />
+                      )}
+                      <div>
+                        {fetching ? (
+                          <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
+                        ) : (
+                          <p className="text-left truncate">
+                            {history.toAddress.toLowerCase() ===
+                            wallet.toLowerCase()
+                              ? "Received"
+                              : history.fromAddress.toLowerCase() ===
+                                  wallet.toLowerCase()
+                                ? "Sent"
+                                : ""}
+                          </p>
+                        )}
+                        {fetching ? (
+                          <Skeleton className="h-4 w-1/2 bg-offwhite" />
+                        ) : (
+                          <p className="text-left truncate">
+                            {history.toAddress.toLowerCase() ===
+                            wallet.toLowerCase()
+                              ? `From: ${history.fromAddress.slice(0, 10)}...`
+                              : history.fromAddress.toLowerCase() ===
+                                  wallet.toLowerCase()
+                                ? `To: ${history.toAddress.slice(0, 10)}...`
+                                : ""}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      {fetching ? (
+                        <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
+                      ) : (
+                        <p
+                          className={`text-right truncate ${
+                            history.toAddress.toLowerCase() ===
+                            wallet.toLowerCase()
+                              ? "text-green-500 font-semibold"
+                              : history.fromAddress.toLowerCase() ===
+                                  wallet.toLowerCase()
+                                ? "text-red-500 font-light"
+                                : "text-offwhite"
+                          }`}
+                        >
+                          {history.toAddress.toLowerCase() ===
+                          wallet.toLowerCase()
+                            ? `+${history.valueDecimal ? parseFloat(history.valueDecimal).toFixed(3) : history.amount} ${history.tokenSymbol || ""}`
+                            : history.fromAddress.toLowerCase() ===
+                                wallet.toLowerCase()
+                              ? `-${history.valueDecimal ? parseFloat(history.valueDecimal).toFixed(3) : history.amount} ${history.tokenSymbol || ""}`
+                              : `0 ${history.tokenSymbol || ""}`}
+                        </p>
+                      )}
+                    </div>
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-lightgrey">No history found.</p>
+            )}
           </TabsContent>
           <TabsContent
             value="transferTab"
@@ -279,9 +371,9 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             <DashboardIcon className="h-6 w-6 flex-shrink-0" />
           </TabsTrigger>
           <TabsTrigger
-            value="activityTab"
+            value="historyTab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
-            onClick={() => handleTabChange("activityTab")}
+            onClick={() => handleTabChange("historyTab")}
           >
             <ActivityLogIcon className="h-6 w-6 flex-shrink-0" />
           </TabsTrigger>
@@ -296,24 +388,35 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
       </Tabs>
       {isModalOpen && modalType && selectedItem && (
         <Modal isOpen={isModalOpen} onClose={closeModal}>
-          {modalType === "nft" && 
-          <NftCard 
-          nft={selectedItem as Nfts}
-          token={selectedItem as Tokens}
-          seedPhrase={seedPhrase}
-          selectedChain={selectedChain}
-          refetchBalances={refetchBalances}
-          closeModal={closeModal}
-           />}
-          {modalType === "token" &&             
-          <TokenCard 
-            token={selectedItem as Tokens}
+          {modalType === "nft" && (
+            <NftCard
+              nft={selectedItem as Nfts}
+              token={selectedItem as Tokens}
+              seedPhrase={seedPhrase}
+              selectedChain={selectedChain}
+              refetchBalances={refetchBalances}
+              closeModal={closeModal}
+            />
+          )}
+          {modalType === "token" && (
+            <TokenCard
+              token={selectedItem as Tokens}
+              logoUrls={logoUrls}
+              seedPhrase={seedPhrase}
+              selectedChain={selectedChain}
+              refetchBalances={refetchBalances}
+              closeModal={closeModal}
+            />
+          )}
+          {/*{modalType === "history" &&             
+          <HistoryCard 
+            history={selectedItem as Historys}
             logoUrls={logoUrls}
             seedPhrase={seedPhrase}
             selectedChain={selectedChain}
             refetchBalances={refetchBalances}
             closeModal={closeModal}
-          />}
+          />}*/}
         </Modal>
       )}
     </div>

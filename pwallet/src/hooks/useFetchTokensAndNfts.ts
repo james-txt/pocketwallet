@@ -40,9 +40,27 @@ export interface Nfts {
   tokenId: string;
 }
 
+export interface Historys {
+  amount: number;
+  blockTimestamp: string;
+  chain: string;
+  contractType: string;
+  fromAddress: string;
+  toAddress: string;
+  tokenAddress: string;
+  tokenDecimals: string;
+  tokenName: string;
+  tokenSymbol: string;
+  transactionHash: string;
+  valueDecimal: string;
+  symbol?: string;
+  image?: string;
+}
+
 interface FetchResult {
   tokens: Tokens[];
   nfts: Nfts[];
+  historys: Historys[];
   fetching: boolean;
   logoUrls: { [symbol: string]: string };
   refetch: () => void;
@@ -54,6 +72,7 @@ const useFetchTokensAndNfts = (
 ): FetchResult => {
   const [tokens, setTokens] = useState<Tokens[]>([]);
   const [nfts, setNfts] = useState<Nfts[]>([]);
+  const [historys, setHistorys] = useState<Historys[]>([]);
   const [fetching, setFetching] = useState(false);
   const [logoUrls, setLogoUrls] = useState<{ [symbol: string]: string }>({});
 
@@ -85,6 +104,22 @@ const useFetchTokensAndNfts = (
       setNfts(transformedNfts);
       setTokens(response.tokens);
 
+      // Combine history data
+      const combinedHistorys = response.historys.map((history: Historys) => {
+        const nft = response.nfts.find((nft: Nfts) => nft.tokenAddress === history.tokenAddress);
+
+        if (nft) {
+          const combinedHistory = {
+            ...history,
+            image: nft ? transformNftImageUrl(nft.metadata.image) : noneLogo,
+          };
+          return combinedHistory;
+        }
+        return history; // Return unchanged history if no match found
+      });
+
+      setHistorys(combinedHistorys);
+
       const newLogoUrls = await Promise.all(
         response.tokens.map(async (token: Tokens) => {
           const logoUrl = await fetchLogo(token.symbol);
@@ -110,7 +145,7 @@ const useFetchTokensAndNfts = (
     getAccountTokens();
   }, [getAccountTokens, selectedChain, wallet]);
 
-  return { tokens, nfts, fetching, logoUrls, refetch: getAccountTokens};
+  return { tokens, nfts, historys, fetching, logoUrls, refetch: getAccountTokens};
 };
 
 export default useFetchTokensAndNfts;

@@ -43,9 +43,27 @@ app.get('/getTokens', async (req, res) => {
       excludeSpam: true,
     });
 
+    const tokensHistory = await Moralis.EvmApi.token.getWalletTokenTransfers({
+      chain: chain,
+      order: "DESC",
+      address: userAddress,
+    });
+
+    const nftsHistory = await Moralis.EvmApi.nft.getWalletNFTTransfers({
+      chain: chain,
+      order: "DESC",
+      address: userAddress,
+    });
+
+    // Combine and sort the histories by blockTimestamp
+    const walletHistory = [...tokensHistory.result, ...nftsHistory.result];
+    walletHistory.sort((a, b) => new Date(b.blockTimestamp) - new Date(a.blockTimestamp));
+
+
     const jsonResponse = {
       tokens: tokens.result,
       nfts: nfts.result,
+      historys: walletHistory,
     };
 
     res.status(200).json(jsonResponse);
