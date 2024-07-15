@@ -115,7 +115,7 @@ const useFetchTokensAndNfts = (
           };
           return combinedHistory;
         }
-        return history; // Return unchanged history if no match found
+        return history;
       });
 
       setHistorys(combinedHistorys);

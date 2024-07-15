@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Modal from "./Modal";
 import NftCard from "./NftCard";
 import TokenCard from "./TokenCard";
-//import HistoryCard from "./HistoryCard";
+import HistoryCard from "./HistoryCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import noneLogo from "../assets/none.png";
 import { calculateTotalNetworth, calculateNetworth24hrUsdChange, calculateNetworth24hrPctChange } from "@/utils/calculateNetworth";
@@ -165,9 +165,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         ) : (
                           <p className="text-left truncate">
                             {parseFloat(token.balance_formatted).toFixed(4)}{" "}
-                            {token.symbol && token.symbol.length <= 5
-                              ? token.symbol
-                              : "???"}
+                            {token.symbol}
                           </p>
                         )}
                       </div>
@@ -274,7 +272,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         history.contractType === "ERC721" ||
                         history.contractType === "ERC721A" ? (
                         <img
-                          src={history.image}
+                          src={history.image || noneLogo}
                           alt={`${history.tokenSymbol} Logo`}
                           className="w-12 h-12"
                         />
@@ -331,11 +329,11 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         >
                           {history.toAddress.toLowerCase() ===
                           wallet.toLowerCase()
-                            ? `+${history.valueDecimal ? parseFloat(history.valueDecimal).toFixed(3) : history.amount} ${history.tokenSymbol || ""}`
+                            ? `+${history.valueDecimal ? parseFloat(history.valueDecimal).toFixed(3) : history.amount} ${history.tokenSymbol ? history.tokenSymbol.slice(0, 5) : ""}`
                             : history.fromAddress.toLowerCase() ===
                                 wallet.toLowerCase()
-                              ? `-${history.valueDecimal ? parseFloat(history.valueDecimal).toFixed(3) : history.amount} ${history.tokenSymbol || ""}`
-                              : `0 ${history.tokenSymbol || ""}`}
+                              ? `-${history.valueDecimal ? parseFloat(history.valueDecimal).toFixed(3) : history.amount} ${history.tokenSymbol ? history.tokenSymbol.slice(0, 5) : ""}`
+                              : `0 ${history.tokenSymbol ? history.tokenSymbol.slice(0, 5) : ""}`}
                         </p>
                       )}
                     </div>
@@ -408,15 +406,14 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
               closeModal={closeModal}
             />
           )}
-          {/*{modalType === "history" &&             
-          <HistoryCard 
-            history={selectedItem as Historys}
-            logoUrls={logoUrls}
-            seedPhrase={seedPhrase}
-            selectedChain={selectedChain}
-            refetchBalances={refetchBalances}
-            closeModal={closeModal}
-          />}*/}
+          {modalType === "history" && (
+            <HistoryCard
+              history={selectedItem as Historys}
+              wallet={wallet}
+              logoUrls={logoUrls}
+              selectedChain={selectedChain}
+            />
+          )}
         </Modal>
       )}
     </div>
