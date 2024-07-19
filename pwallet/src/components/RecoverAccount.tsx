@@ -22,11 +22,11 @@ const RecoverAccount: React.FC<RecoverAccountProps> = ({ setWallet, setSeedPhras
     setTypedSeed(e.target.value);
   }
 
-  function recoverWallet() {
+  const recoverWallet = () => {
     let recoveredWallet;
     try {
       if (typedSeed === null) {
-        throw new Error("Invalid seed phrase");
+        throw new Error('Invalid seed phrase');
       }
       recoveredWallet = Wallet.fromPhrase(typedSeed);
     } catch (err) {
@@ -36,8 +36,19 @@ const RecoverAccount: React.FC<RecoverAccountProps> = ({ setWallet, setSeedPhras
 
     setSeedPhrase(typedSeed);
     setWallet(recoveredWallet.address);
-    navigate("/yourwallet");
-  }
+    chrome.runtime.sendMessage({ action: 'storeSeedPhrase', seedPhrase: typedSeed }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error storing seed phrase:', chrome.runtime.lastError);
+      } else if (response && response.success) {
+        console.log('Seed phrase stored successfully.');
+        navigate('/yourwallet');
+      } else {
+        console.log('Failed to store seed phrase.');
+      }
+    });
+
+    console.log('Seed phrase stored from recover account.');
+  };
 
   return (
     <div className="content px-4">

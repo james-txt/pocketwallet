@@ -165,7 +165,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                         ) : (
                           <p className="text-left truncate">
                             {parseFloat(token.balance_formatted).toFixed(4)}{" "}
-                            {token.symbol}
+                            {token.symbol.slice(0, 5)}
                           </p>
                         )}
                       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Home from './components/Home';
 import CreateAccount from './components/CreateAccount';
@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import useClipboard from './utils/useClipboard';
 import { ChainKey } from './utils/chains';
-
+import { Wallet } from 'ethers';
 
 const App: React.FC = () => {
   const { tooltipText, copied, open, copyToClipboard, setOpen } = useClipboard();
@@ -27,11 +27,43 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const retrieveSeedPhrase = () => {
+    chrome.runtime.sendMessage({ action: 'getSeedPhrase' }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error retrieving seed phrase:', chrome.runtime.lastError);
+      } else if (response && response.seedPhrase) {
+        console.log('Seed phrase retrieved');
+        setSeedPhrase(response.seedPhrase);
+        setWallet(Wallet.fromPhrase(response.seedPhrase).address);
+        navigate('/yourwallet');
+      } else {
+        console.log('No seed phrase found in storage.');
+      }
+    });
+  };
+
+  useEffect(() => {
+    retrieveSeedPhrase();
+  }, []);
+
   const lockWallet = () => {
     setSeedPhrase(null);
     setWallet(null);
+    console.log('Seed phrase cleared.');
+
+    chrome.runtime.sendMessage({ action: 'clearSeedPhrase' }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error handling response:', chrome.runtime.lastError);
+      } else if (response && response.success) {
+        console.log('Seed phrase was successfully cleared from storage.');
+      } else {
+        console.log('Failed to clear seed phrase from storage.');
+      }
+    });
+
     navigate("/");
   };
+  
 
   const truncateWalletAddress = (address: string | null) => {
     if (!address) return '';
@@ -43,6 +75,7 @@ const App: React.FC = () => {
       copyToClipboard(wallet);
     }
   };
+
 
   const menuHeader = () => {
     const currentPath = location.pathname;

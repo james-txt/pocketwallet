@@ -21,14 +21,30 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
     setNewSeedPhrase(mnemonic);
   }
 
-  async function setWalletAndMnemonic() {
-    if (newSeedPhrase && setSeedPhrase && setWallet) {
-      setSeedPhrase(newSeedPhrase);
-      const wallet = Wallet.fromPhrase(newSeedPhrase);
-      setWallet(wallet.address);
-      navigate('/yourwallet');
+  const setWalletAndMnemonic = async () => {
+    if (newSeedPhrase) {
+      try {
+        const wallet = Wallet.fromPhrase(newSeedPhrase);
+        setSeedPhrase(newSeedPhrase);
+        setWallet(wallet.address);
+
+        chrome.runtime.sendMessage({ action: 'storeSeedPhrase', seedPhrase: newSeedPhrase }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('Error storing seed phrase:', chrome.runtime.lastError);
+          } else if (response && response.success) {
+            console.log('Seed phrase stored successfully.');
+            navigate('/yourwallet');
+          } else {
+            console.log('Failed to store seed phrase.');
+          }
+        });
+
+        console.log('Seed phrase stored from create account.');
+      } catch (error) {
+        console.error('Error setting wallet and seed phrase:', error);
+      }
     }
-  }
+  };
 
   return (
     <div className="content px-4">
@@ -48,7 +64,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ setSeedPhrase, setWallet 
       >
         Generate Seed Phrase
       </Button>
-      <Card className="seedPhraseContainer bg-black text-offwhite">
+      <Card className="seedPhraseContainer bg-black text-base text-offwhite">
         {newSeedPhrase &&
           newSeedPhrase.split(" ").map((word, index, wordsArray) => (
             <span className="pt-1" key={index}>
