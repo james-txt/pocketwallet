@@ -32,10 +32,10 @@ const App: React.FC = () => {
       if (chrome.runtime.lastError) {
         console.error('Error retrieving seed phrase:', chrome.runtime.lastError);
       } else if (response && response.seedPhrase) {
-        console.log('Seed phrase retrieved');
+        console.log('Seed phrase retrieved:', response.seedPhrase);
         setSeedPhrase(response.seedPhrase);
         setWallet(Wallet.fromPhrase(response.seedPhrase).address);
-        navigate('/yourwallet');
+        navigate("/yourwallet");
       } else {
         console.log('No seed phrase found in storage.');
       }

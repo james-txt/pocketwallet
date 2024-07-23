@@ -21,6 +21,20 @@ interface ViewWalletProps {
   selectedChain: ChainKey;
 }
 
+const groupHistoryByDate = (historys: Historys[]) => {
+  return historys.reduce((groups: { [key: string]: Historys[] }, history) => {
+    const date = new Intl.DateTimeFormat('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(history.blockTimestamp));
+    
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(history);
+    return groups;
+  }, {});
+};
+
+
+
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhrase }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"nft" | "token" | "history" | null>(null);
@@ -32,6 +46,8 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
     wallet,
     selectedChain
   );
+
+  const groupedHistorys = groupHistoryByDate(historys);
 
   const handleTabChange = (value: string) => {
     setFadeClass("fade-out-right");
@@ -250,16 +266,15 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
               currentTab === "historyTab" ? fadeClass : "opacity-0"
             }`}
           >
+            <h2 className="text-center text-offwhite mb-2">Recent Activity</h2>
             {fetching ? (
-              historys.map((_, index) => (
-                <Skeleton
-                  key={index}
-                  className="w-full py-8 mt-1 mb-2 bg-char"
-                />
-              ))
-            ) : historys.length > 0 ? (
-              <div>
-                {historys.map((history, historyIndex) => (
+              <Skeleton className="w-full py-8 mt-10 bg-char" />
+            ) : Object.keys(groupedHistorys).length > 0 ? (
+              <div className="flex flex-col items-center justify-center">
+                {Object.entries(groupedHistorys).map(([date, historyItems], index) => (
+                  <div key={index} className="w-full max-w-sm mb-1">
+                    <h4 className="text-left text-lightgrey mb-2">{date}</h4>
+                    {historyItems.map((history, historyIndex) => (
                   <Button
                     className="w-full h-16 p-2 px-4 mt-1 mb-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
                     key={historyIndex}
@@ -340,6 +355,8 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                   </Button>
                 ))}
               </div>
+                ))}
+                </div>
             ) : (
               <p className="text-center text-lightgrey">No history found.</p>
             )}
