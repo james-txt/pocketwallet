@@ -15,8 +15,42 @@ You can ~install~ pocket Wallet right now:
 
 ## Quick Start
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+Before you begin, ensure you have met the following requirements:
 
-### Prerequisites
+- Node.js `20.13.1` or later
+- npm `10.8.1` or later
 
-What things you need to install the software and how to install them
+Follow these steps to set up the project on your local machine:
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/james-txt/pocketwallet.git
+   cd pocketwallet
+
+2. **Install dependencies**
+
+   ```bash
+   npm install:all
+
+3. **Add keys to `dist.env` and rename to `.env`**
+
+4. **Build**
+
+   ```bash
+   npm build
+
+5. **Start backend**
+
+   ```bash
+   cd backend
+   npm run start
+
+6. **Load extension to your Browser**
+
+    - Go to:
+     ```bash
+     chrome://extensions/
+     ```
+    - Check off Developer mode
+    - Load unpacked `dist` folder
