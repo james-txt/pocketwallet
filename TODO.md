@@ -1,0 +1,28 @@
+# To-Do
+- [x] App page
+    - [x] lock wallet, clear seedPhrase/wallet
+    - [x] choose blockchain network
+    - [x] retrieve logo from local 
+    - [x] setup routes
+    - [x] display wallet address, click to clipboard
+    - [x] on startup retieve stored seedphrase route to viewwallet
+- [x] Home tab
+    - [x] create wallet/recover wallet comp
+    - [x] generate seedphrase, wallet mnemonic
+    - [x] set seedphrase/wallet
+- [x] Create modal comp
+- [x] ViewWallet tab
+    - [x] setup  tab change
+- [x] Token tab
+    - [x] setup token ui
+    - [x] 
+- [x] Nft tab
+- [x] History tab
+    - [x] group tx by date
+- [ ] Swap tab
+    - [ ] use uniswap api
+- [x] Chrome ext compatibility
+    - [x ] encryption/decryption
+- [ ] Documentation
+- [ ] Upload backend to vercel?
+- [ ] Walletconnect to dApps
