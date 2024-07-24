@@ -3,7 +3,7 @@ backend/index.jsbak
 backend/getTokens.jsonbak
 node_modules
 backend/getTokens.jsonbakk
-*.env
+.env
 .vscode
 
 node_modules

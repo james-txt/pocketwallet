@@ -7,7 +7,7 @@
     "build:backend": "npm run build --prefix backend",
     "build:pwallet": "npm run build --prefix pwallet",
     "build": "npm run build:pwallet && npm run build:backend",
-    "start": "node backend/dist/index.js"
+    "start": "node dist/index.js"
   },
   "workspaces": [
     "backend",

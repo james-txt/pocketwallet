@@ -1,10 +1,9 @@
-require('dotenv').config({ path: 'secrets.env' });
+require('dotenv').config();
 const express = require('express');
 const Moralis = require('moralis').default;
-const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
-
+const path = require('path');
 const app = express();
 const port = 3000;
 
