@@ -40,11 +40,11 @@ Follow these steps to set up the project on your local machine:
    ```bash
    npm build
 
-5. **Start backend**
+5. **Backend is hosted on Azure**
 
    ```bash
-   cd backend
-   npm run start
+    ~~cd backend
+   npm run start~~
 
 6. **Load extension to your Browser**
 

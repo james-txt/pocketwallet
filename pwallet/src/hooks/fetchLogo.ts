@@ -6,7 +6,7 @@ export const fetchLogo = async (symbol: string): Promise<string> => {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/logo?symbol=${symbol}`);
+    const response = await fetch(`https://pocketwallet.azurewebsites.net/logo?symbol=${symbol}`);
     if (!response.ok) {
       throw new Error("Logo not found");
     }

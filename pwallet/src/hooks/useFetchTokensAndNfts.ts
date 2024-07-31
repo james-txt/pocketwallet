@@ -85,7 +85,7 @@ const useFetchTokensAndNfts = (
   const getAccountTokens = useCallback(async () => {
     setFetching(true);
     try {
-      const res = await axios.get("http://localhost:3000/getTokens", {
+      const res = await axios.get("https://pocketwallet.azurewebsites.net/getTokens", {
         params: {
           userAddress: wallet,
           chain: selectedChain,

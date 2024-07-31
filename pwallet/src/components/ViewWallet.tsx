@@ -362,12 +362,12 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             )}
           </TabsContent>
           <TabsContent
-            value="transferTab"
+            value="swapTab"
             className={`absolute w-full h-full transition-opacity duration-50 ${
-              currentTab === "transferTab" ? fadeClass : "opacity-0"
+              currentTab === "swapTab" ? fadeClass : "opacity-0"
             }`}
           >
-            Make transfers in your account here.
+            Make token swaps in your account here.
           </TabsContent>
         </div>
         <TabsList className="z-10 fixed grid w-[320px] grid-cols-4 h-[64px] rounded-none bg-blacker focus:bg-blacker">
@@ -393,9 +393,9 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             <ActivityLogIcon className="h-6 w-6 flex-shrink-0" />
           </TabsTrigger>
           <TabsTrigger
-            value="transferTab"
+            value="swapTab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
-            onClick={() => handleTabChange("transferTab")}
+            onClick={() => handleTabChange("swapTab")}
           >
             <FontAwesomeIcon size="xl" icon={faArrowRightArrowLeft} />
           </TabsTrigger>
