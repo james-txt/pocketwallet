@@ -1,4 +1,7 @@
 # To-Do
+- [x] Backend
+    - [x] Fetch logo.png by symbol data
+    - [x] Fetch token, nft, histroy data by address
 - [x] App page
     - [x] lock wallet, clear seedPhrase/wallet
     - [x] choose blockchain network
@@ -12,10 +15,18 @@
     - [x] set seedphrase/wallet
 - [x] Create modal comp
 - [x] ViewWallet tab
-    - [x] setup  tab change
+    - [x] setup navigation bar
+    - [x] setup tab change
 - [x] Token tab
     - [x] setup token ui
-    - [x] 
+    - [x] display wallet total balance, price in usd
+    - [x] display wallet price change by percentage and usd value
+    - [x] display tokens name, logo, symbol, amount, price, value in usd
+    - [x] Token modal
+        - [x] send to address and amount input transaction
+        - [x] fetch gas price fee for transaction
+        - [x] send transaction via rpcURL, tokenContract
+        - [x] fetch and display transaction receipt
 - [x] Nft tab
 - [x] History tab
     - [x] group tx by date
@@ -24,5 +35,5 @@
 - [x] Chrome ext compatibility
     - [x] encryption/decryption
 - [ ] Documentation
-- [ ] Upload backend to vercel?
+- [ ] Upload backend to azure
 - [ ] Walletconnect to dApps
