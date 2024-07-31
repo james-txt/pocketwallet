@@ -33,7 +33,7 @@ Follow these steps to set up the project on your local machine:
    ```bash
    npm install:all
 
-3. **Add keys to `dist.env` and rename to `.env`**
+3. **Add keys to `dist.env` in `\pwallet` and rename to `.env`**
 
 4. **Build**
 
