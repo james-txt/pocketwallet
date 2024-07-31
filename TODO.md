@@ -22,7 +22,7 @@
 - [ ] Swap tab
     - [ ] use uniswap api
 - [x] Chrome ext compatibility
-    - [x ] encryption/decryption
+    - [x] encryption/decryption
 - [ ] Documentation
 - [ ] Upload backend to vercel?
 - [ ] Walletconnect to dApps
