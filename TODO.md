@@ -2,6 +2,7 @@
 - [x] Backend
     - [x] Fetch logo.png by symbol data
     - [x] Fetch token, nft, histroy data by address
+    - [ ] write tests
 - [x] App page
     - [x] lock wallet, clear seedPhrase/wallet
     - [x] choose blockchain network
@@ -9,14 +10,18 @@
     - [x] setup routes
     - [x] display wallet address, click to clipboard
     - [x] on startup retieve stored seedphrase route to viewwallet
+    - [ ] split logic into components
+    - [ ] write tests
 - [x] Home tab
     - [x] create wallet/recover wallet comp
     - [x] generate seedphrase, wallet mnemonic
     - [x] set seedphrase/wallet
+    - [ ] write tests
 - [x] Create modal comp
 - [x] ViewWallet tab
     - [x] setup navigation bar
     - [x] setup tab change
+    - [ ] write tests
 - [x] Token tab
     - [x] setup token ui
     - [x] display wallet total balance, price in usd
@@ -27,13 +32,19 @@
         - [x] fetch gas price fee for transaction
         - [x] send transaction via rpcURL, tokenContract
         - [x] fetch and display transaction receipt
+    - [ ] write tests
 - [x] Nft tab
+    - [ ] write tests
 - [x] History tab
     - [x] group tx by date
+    - [ ] write tests
 - [ ] Swap tab
     - [ ] use uniswap api
-- [x] Chrome ext compatibility
+- [x] Webpacks
+    - [x] chrome ext compatibility
     - [x] encryption/decryption
+    - [ ] split background.js into multiple files
+    - [ ] write tests
 - [ ] Documentation
 - [ ] Upload backend to azure
 - [ ] Walletconnect to dApps
