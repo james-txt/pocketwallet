@@ -28,8 +28,13 @@ jobs:
       
       - name: Create .zip package for deployment
         run: |
-          zip -r node-app.zip . -x "*.env" "package-lock.json" "jest.config.js" "tests/*" "node_modules/*"  # Create a zip file excluding specified files
-      
+          $zipFile = "node-app.zip"
+          $filesToExclude = @("*.env", "package-lock.json", "jest.config.js", "tests/*", "node_modules/*")
+          $files = Get-ChildItem -Path . -Recurse -Exclude $filesToExclude
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(".", $zipFile) # Create zip file
+          Remove-Item $zipFile -Force # Remove the existing zip file
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(".", $zipFile) # Create zip file again excluding specified files
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
