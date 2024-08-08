@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +24,14 @@ jobs:
       - name: npm install, build, and test
         run: |
           npm install
+          npm run build --if-present
           npm run test --if-present
-      
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: node-app.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,5 +52,5 @@ jobs:
         with:
           app-name: 'pocketwallet'
           slot-name: 'Production'
-          package: .
+          package: node-app.zip  # Use the created zip package
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BB65A50FBD7E4F69A9F0F87F32F7C481 }}
