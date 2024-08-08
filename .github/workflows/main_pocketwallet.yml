@@ -28,11 +28,8 @@ jobs:
       
       - name: Create .zip package for deployment
         run: |
-          mkdir -p package
-          cp -r * package/    # Copy all files to the package folder
-          rm -rf package/.env package/package-lock.json package/jest.config.js package/tests  # Remove excluded files
-          cd package && zip -r ../node-app.zip .  # Create a zip file
-
+          zip -r node-app.zip . -x "*.env" "package-lock.json" "jest.config.js" "tests/*" "node_modules/*"  # Create a zip file excluding specified files
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
