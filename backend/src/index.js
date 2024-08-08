@@ -24,5 +24,5 @@ Moralis.start({
 });
 
 // Test URLs:
-// http://localhost:3000/getTokens?userAddress=0x887E3DB0D16807730fA40619c70C4846a79cA854&chain=0x1
+// http://localhost:3000/getTokens?userAddress=0x58389591c0786f875744119f79Db8a6ecbc3c3e7&chain=0xaa36a7
 // http://localhost:3000/logo?symbol=eth
