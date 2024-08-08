@@ -26,11 +26,6 @@ jobs:
           cd backend  # Change to the backend directory
           npm install
           npm run test --if-present
-      
-      - name: Create .zip package for deployment
-        run: |
-          cd backend  # Change to the backend directory
-          zip -r ../node-app.zip . -x "*.env" "package-lock.json" "jest.config.js" "tests/*" "node_modules/*"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
