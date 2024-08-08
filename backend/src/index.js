@@ -1,77 +1,19 @@
 require('dotenv').config();
 const express = require('express');
 const Moralis = require('moralis').default;
-const fs = require('fs');
 const cors = require('cors');
-const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
+const getLogo = require('./routes/logo');
+const getTokens = require('./routes/getTokens');
 
 app.use(cors());
 app.use(express.json());
 
-// Serve logos
-app.get('/logo', (req, res) => {
-  const { symbol } = req.query;
-  const imagePath = path.join(__dirname, 'cryptoicons', `${symbol.toLowerCase()}.png`);
-  try {
-    const image = fs.readFileSync(imagePath);
-    res.writeHead(200, { 'Content-Type': 'image/png' });
-    res.end(image, 'binary');
-  } catch (err) {
-    console.error(err);
-    res.status(404).send('Image not found');
-  }
-});
+app.get('/logo', getLogo);
 
-// Fetch tokens and NFTs
-app.get('/getTokens', async (req, res) => {
-  const { userAddress, chain } = req.query;
-
-  try {
-    const tokens = await Moralis.EvmApi.wallets.getWalletTokenBalancesPrice({
-      chain: chain,
-      address: userAddress,
-    });
-
-    const nfts = await Moralis.EvmApi.nft.getWalletNFTs({
-      chain: chain,
-      address: userAddress,
-      normalizeMetadata: true,
-      mediaItems: false,
-      excludeSpam: true,
-    });
-
-    const tokensHistory = await Moralis.EvmApi.token.getWalletTokenTransfers({
-      chain: chain,
-      order: "DESC",
-      address: userAddress,
-    });
-
-    const nftsHistory = await Moralis.EvmApi.nft.getWalletNFTTransfers({
-      chain: chain,
-      order: "DESC",
-      address: userAddress,
-    });
-
-    // Combine and sort the histories by blockTimestamp
-    const walletHistory = [...tokensHistory.result, ...nftsHistory.result];
-    walletHistory.sort((a, b) => new Date(b.blockTimestamp) - new Date(a.blockTimestamp));
-
-
-    const jsonResponse = {
-      tokens: tokens.result,
-      nfts: nfts.result,
-      historys: walletHistory,
-    };
-
-    res.status(200).json(jsonResponse);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred while fetching data' });
-  }
-});
+app.get('/getTokens', getTokens);
 
 Moralis.start({
   apiKey: process.env.MORALIS_KEY,

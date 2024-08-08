@@ -1,8 +1,9 @@
 # To-Do
 - [x] Backend
-    - [x] Fetch logo.png by symbol data
-    - [x] Fetch token, nft, histroy data by address
-    - [ ] write tests
+    - [x] fetch logo.png by symbol data
+    - [x] fetch token, nft, histroy data by address
+    - [x] split logic
+    - [x] write tests
 - [x] App page
     - [x] lock wallet, clear seedPhrase/wallet
     - [x] choose blockchain network
