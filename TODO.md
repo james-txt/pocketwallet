@@ -41,6 +41,10 @@
     - [ ] write tests
 - [ ] Swap tab
     - [ ] use uniswap api
+- [ ] NftCard
+    - [ ] Fix drawer display issue, not displaying base page
+- [ ] TokenCard
+    - [ ] Fix drawer display issue, not displaying base page
 - [x] Webpacks
     - [x] chrome ext compatibility
     - [x] encryption/decryption

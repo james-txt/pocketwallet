@@ -2,6 +2,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { configDefaults } from 'vitest/config';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -13,7 +14,7 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         input: {
           main: path.resolve(__dirname, 'index.html'),
-          background: path.resolve(__dirname, 'webpack/background.js')
+          background: path.resolve(__dirname, 'webpack/background.js'),
         },
         output: {
           entryFileNames: '[name].js',
@@ -26,14 +27,14 @@ export default defineConfig(({ mode }) => {
         targets: [
           {
             src: 'manifest.json',
-            dest: '.'
+            dest: '.',
           },
           {
             src: 'src/assets/*',
-            dest: 'assets'
-          }
-        ]
-      })
+            dest: 'assets',
+          },
+        ],
+      }),
     ],
     server: {
       port: 5173,
@@ -44,7 +45,11 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'process.env': env
-    }
+      'process.env': env,
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+    },
   };
 });

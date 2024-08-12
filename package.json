@@ -12,5 +12,8 @@
   "workspaces": [
     "backend",
     "pwallet"
-  ]
+  ],
+  "dependencies": {
+    "@ethersproject/signing-key": "^5.7.0"
+  }
 }
