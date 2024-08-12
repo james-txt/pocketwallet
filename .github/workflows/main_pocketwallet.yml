@@ -19,12 +19,12 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
-          node-version: '20.x'
+          node-version: '20'
 
       - name: Set environment variables
         run: echo "MORALIS_KEY=${{ secrets.MORALIS_KEY }}" >> $GITHUB_ENV
       
-      - name: npm install, build, and test
+      - name: npm install and test
         run: |
           cd backend  # Change to the backend directory
           npm install
