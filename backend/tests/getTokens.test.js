@@ -189,6 +189,7 @@ describe('getTokens', () => {
         possibleSpam: false,
         valueDecimal: "1",
         verifiedContract: false,
+        securityScore: null,
         chain: "0xaa36a7"
       },
       {
