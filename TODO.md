@@ -11,18 +11,19 @@
     - [x] setup routes
     - [x] display wallet address, click to clipboard
     - [x] on startup retieve stored seedphrase route to viewwallet
-    - [ ] split logic into components
-    - [ ] write tests
+    - [x] split logic into components
+    - [x] write tests
 - [x] Home tab
     - [x] create wallet/recover wallet comp
     - [x] generate seedphrase, wallet mnemonic
     - [x] set seedphrase/wallet
-    - [ ] write tests
-- [x] Create modal comp
+    - [x] write tests
 - [x] ViewWallet tab
     - [x] setup navigation bar
     - [x] setup tab change
-    - [ ] write tests
+    - [] write tests
+        - [x] Create modal comp
+        - [x] write tests
 - [x] Token tab
     - [x] setup token ui
     - [x] display wallet total balance, price in usd

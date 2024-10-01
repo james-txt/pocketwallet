@@ -14,11 +14,11 @@ export interface Tokens {
   balance: string;
   possible_spam: boolean;
   verified_contract: boolean;
-  usd_price: number;
-  usd_price_24hr_percent_change: number;
-  usd_price_24hr_usd_change: number;
-  usd_value_24hr_usd_change: number;
-  usd_value: number;
+  usd_price: number | null;
+  usd_price_24hr_percent_change: number | null;
+  usd_price_24hr_usd_change: number | null;
+  usd_value_24hr_usd_change: number | null;
+  usd_value: number | null;
   portfolio_percentage: number;
   balance_formatted: string;
   native_token: boolean;

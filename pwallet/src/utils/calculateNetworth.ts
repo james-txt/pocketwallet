@@ -16,7 +16,7 @@ export const calculateNetworth24hrUsdChange = (tokens: Tokens[]): number => {
 
 export const calculateNetworth24hrPctChange = (tokens: Tokens[]): number => {
   const initialNetworth = tokens.reduce((acc, token) => {
-    const initialUsdValue = token.usd_value - (token.usd_value_24hr_usd_change || 0);
+    const initialUsdValue = (token.usd_value || 0) - (token.usd_value_24hr_usd_change || 0);
     return acc + initialUsdValue;
   }, 0);
 

@@ -15,5 +15,8 @@
   ],
   "dependencies": {
     "@ethersproject/signing-key": "^5.7.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-prettier": "^5.2.1"
   }
 }
