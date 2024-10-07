@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { DashboardIcon, ActivityLogIcon } from "@radix-ui/react-icons";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -47,234 +47,222 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
     selectedChain
   );
 
-  const groupedHistorys = groupHistoryByDate(historys);
+  const groupedHistorys = useMemo(() => groupHistoryByDate(historys), [historys]);
 
-  const handleTabChange = (value: string) => {
+  const handleTabChange = useCallback((value: string) => {
     setFadeClass("fade-out-right");
     setTimeout(() => {
       setCurrentTab(value);
       setFadeClass("fade-in-left");
       closeModal();
     }, 100);
-  };
-  const openModal = (type: "nft" | "token" | "history", item: Nfts | Tokens | Historys | null = null) => {
+  }, []);
+
+  const openModal = useCallback((type: "nft" | "token" | "history", item: Nfts | Tokens | Historys | null = null) => {
     setSelectedItem(item);
     setModalType(type);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedItem(null);
     setModalType(null);
-  };
+  }, []);
 
   useEffect(() => {
     closeModal();
-  }, [selectedChain]);
+  }, [selectedChain, closeModal]);
 
-  const totalNetworth = parseFloat(calculateTotalNetworth(tokens).toFixed(2));
-  const totalNetworth24hrUsdChange = parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2));
-  const totalNetworth24hrPctChange = parseFloat(calculateNetworth24hrPctChange(tokens).toFixed(2));
+  const { totalNetworth, totalNetworth24hrUsdChange, totalNetworth24hrPctChange } = useMemo(() => ({
+    totalNetworth: parseFloat(calculateTotalNetworth(tokens).toFixed(2)),
+    totalNetworth24hrUsdChange: parseFloat(calculateNetworth24hrUsdChange(tokens).toFixed(2)),
+    totalNetworth24hrPctChange: parseFloat(calculateNetworth24hrPctChange(tokens).toFixed(2))
+  }), [tokens]);
 
-  const refetchBalances = () => {
+  const refetchBalances = useCallback(() => {
     if (refetch) {
       refetch();
     }
-  };
+  }, [refetch]);
 
-  return (
-    <div className="content">
-      <Tabs
-        defaultValue="tokenTab"
-        value={currentTab}
-        className="w-[320px] rounded-none"
-      >
-        <div className="relative w-full h-[470px]">
-          <TabsContent
-            value="tokenTab"
-            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
-              currentTab === "tokenTab" ? fadeClass : "opacity-0"
-            }`}
+  const renderTokenTab = () => (
+    <>
+    {fetching ? (
+      <Skeleton className="w-1/2 bg-offwhite mx-auto py-4 mb-5 mt-8" />
+    ) : (
+      <h1 className="pt-6 pb-2 text-5xl tracking-tight">
+        ${totalNetworth ? totalNetworth : "0.00"}
+      </h1>
+    )}
+    <div className="flex gap-2 justify-center mb-8 tracking-tight">
+      {fetching ? (
+        <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
+      ) : (
+        <h3
+          className={`${
+            totalNetworth24hrUsdChange > 0.001
+              ? "text-green-500 font-semibold"
+              : totalNetworth24hrUsdChange < -0.001
+                ? "text-red-500 font-light"
+                : "text-offwhite"
+          }`}
+        >
+          {totalNetworth24hrUsdChange > 0.001
+            ? `+$${totalNetworth24hrUsdChange.toFixed(2)}`
+            : totalNetworth24hrUsdChange < -0.001
+              ? `-$${Math.abs(totalNetworth24hrUsdChange).toFixed(2)}`
+              : "0.00"}
+        </h3>
+      )}
+      {fetching ? (
+        <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
+      ) : (
+        <h3
+          className={`${
+            totalNetworth24hrPctChange > 0.001
+              ? "text-green-500 bg-green-500 rounded bg-opacity-10 px-2 font-semibold"
+              : totalNetworth24hrPctChange < -0.001
+                ? "text-red-500 bg-red-500 rounded bg-opacity-10 px-2 font-light"
+                : "text-offwhite"
+          }`}
+        >
+          {totalNetworth24hrPctChange > 0.001
+            ? `+${totalNetworth24hrPctChange.toFixed(2)}%`
+            : totalNetworth24hrPctChange < -0.001
+              ? `${totalNetworth24hrPctChange.toFixed(2)}%`
+              : "0.00"}
+        </h3>
+      )}
+    </div>
+    {fetching ? (
+      tokens.map((_, index) => (
+        <Skeleton key={index} className="w-full py-8 my-3 bg-char" />
+      ))
+    ) : tokens.length > 0 ? (
+      <div>
+        {tokens.map((token, tokenIndex) => (
+          <Button
+            className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
+            key={tokenIndex}
+            onClick={() => openModal("token", token)}
           >
-            {fetching ? (
-              <Skeleton className="w-1/2 bg-offwhite mx-auto py-4 mb-5 mt-8" />
-            ) : (
-              <h1 className="pt-6 pb-2 text-5xl tracking-tight">
-                ${totalNetworth ? totalNetworth : "0.00"}
-              </h1>
-            )}
-            <div className="flex gap-2 justify-center mb-8 tracking-tight">
+            <div className="flex gap-2 place-items-center">
               {fetching ? (
-                <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
+                <Skeleton className="w-12 h-12 bg-offwhite rounded-full" />
               ) : (
-                <h3
-                  className={`${
-                    totalNetworth24hrUsdChange > 0.001
+                <img
+                  src={logoUrls[token.symbol] || noneLogo}
+                  alt={`${token.symbol} Logo`}
+                  className="w-12 h-12"
+                />
+              )}
+              <div>
+                {fetching ? (
+                  <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
+                ) : (
+                  <p className="text-left truncate">
+                    {token.name.length > 15
+                      ? `${token.name.slice(0, 15)}...`
+                      : token.name}
+                  </p>
+                )}
+                {fetching ? (
+                  <Skeleton className="h-4 w-1/2 bg-offwhite" />
+                ) : (
+                  <p className="text-left truncate">
+                    {parseFloat(token.balance_formatted).toFixed(4)}{" "}
+                    {token.symbol.slice(0, 5)}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div>
+              {fetching ? (
+                <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
+              ) : (
+                <p className="text-right">
+                  {token.usd_value
+                    ? `$${token.usd_value.toFixed(2)}`
+                    : "$0.00"}
+                </p>
+              )}
+              {fetching ? (
+                <Skeleton className="h-4 w-1/2 bg-offwhite" />
+              ) : (
+                <p
+                  className={`text-right ${
+                    (token.usd_value_24hr_usd_change ?? 0) > 0.001
                       ? "text-green-500 font-semibold"
-                      : totalNetworth24hrUsdChange < -0.001
+                      : (token.usd_value_24hr_usd_change ?? 0) < -0.001
                         ? "text-red-500 font-light"
                         : "text-offwhite"
                   }`}
                 >
-                  {totalNetworth24hrUsdChange > 0.001
-                    ? `+$${totalNetworth24hrUsdChange.toFixed(2)}`
-                    : totalNetworth24hrUsdChange < -0.001
-                      ? `-$${Math.abs(totalNetworth24hrUsdChange).toFixed(2)}`
-                      : "0.00"}
-                </h3>
-              )}
-              {fetching ? (
-                <Skeleton className="w-1/6 bg-offwhite py-2 my-1" />
-              ) : (
-                <h3
-                  className={`${
-                    totalNetworth24hrPctChange > 0.001
-                      ? "text-green-500 bg-green-500 rounded bg-opacity-10 px-2 font-semibold"
-                      : totalNetworth24hrPctChange < -0.001
-                        ? "text-red-500 bg-red-500 rounded bg-opacity-10 px-2 font-light"
-                        : "text-offwhite"
-                  }`}
-                >
-                  {totalNetworth24hrPctChange > 0.001
-                    ? `+${totalNetworth24hrPctChange.toFixed(2)}%`
-                    : totalNetworth24hrPctChange < -0.001
-                      ? `${totalNetworth24hrPctChange.toFixed(2)}%`
-                      : "0.00"}
-                </h3>
-              )}
-            </div>
-            {fetching ? (
-              tokens.map((_, index) => (
-                <Skeleton key={index} className="w-full py-8 my-3 bg-char" />
-              ))
-            ) : tokens.length > 0 ? (
-              <div>
-                {tokens.map((token, tokenIndex) => (
-                  <Button
-                    className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
-                    key={tokenIndex}
-                    onClick={() => openModal("token", token)}
-                  >
-                    <div className="flex gap-2 place-items-center">
-                      {fetching ? (
-                        <Skeleton className="w-12 h-12 bg-offwhite rounded-full" />
-                      ) : (
-                        <img
-                          src={logoUrls[token.symbol] || noneLogo}
-                          alt={`${token.symbol} Logo`}
-                          className="w-12 h-12"
-                        />
-                      )}
-                      <div>
-                        {fetching ? (
-                          <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
-                        ) : (
-                          <p className="text-left truncate">
-                            {token.name.length > 15
-                              ? `${token.name.slice(0, 15)}...`
-                              : token.name}
-                          </p>
-                        )}
-                        {fetching ? (
-                          <Skeleton className="h-4 w-1/2 bg-offwhite" />
-                        ) : (
-                          <p className="text-left truncate">
-                            {parseFloat(token.balance_formatted).toFixed(4)}{" "}
-                            {token.symbol.slice(0, 5)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      {fetching ? (
-                        <Skeleton className="h-4 w-3/4 bg-offwhite mb-1" />
-                      ) : (
-                        <p className="text-right">
-                          {token.usd_value
-                            ? `$${token.usd_value.toFixed(2)}`
-                            : "$0.00"}
-                        </p>
-                      )}
-                      {fetching ? (
-                        <Skeleton className="h-4 w-1/2 bg-offwhite" />
-                      ) : (
-                        <p
-                          className={`text-right ${
-                            token.usd_value_24hr_usd_change > 0.001
-                              ? "text-green-500 font-semibold"
-                              : token.usd_value_24hr_usd_change < -0.001
-                                ? "text-red-500 font-light"
-                                : "text-offwhite"
-                          }`}
-                        >
-                          {token.usd_value && token.usd_value_24hr_usd_change
-                            ? `-$${Math.abs(token.usd_value_24hr_usd_change).toFixed(2)}`
-                            : "$0.00"}
-                        </p>
-                      )}
-                    </div>
-                  </Button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-lightgrey">No tokens found.</p>
-            )}
-          </TabsContent>
-          <TabsContent
-            value="nftTab"
-            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
-              currentTab === "nftTab" ? fadeClass : "opacity-0"
-            }`}
-          >
-            <div className="grid grid-cols-2 gap-2 mt-1 mb-4">
-              {fetching ? (
-                Array.from({ length: 8 }).map((_, index) => (
-                  <Skeleton
-                    key={index}
-                    className="w-full rounded-md h-[156px] bg-blacker"
-                  />
-                ))
-              ) : nfts.length > 0 ? (
-                nfts.map((nft, index) => (
-                  <Button
-                    key={index}
-                    onClick={() => openModal("nft", nft)}
-                    style={{ cursor: "pointer" }}
-                    className="relative rounded-md w-full h-full overflow-hidden p-0 hover:bg-inherit bg-blacker shadow-blackest shadow-sm"
-                  >
-                    <img
-                      src={nft.metadata.image}
-                      alt={`nft-${index}`}
-                      className="object-contain"
-                    />
-                    <h4 className="absolute bottom-0 left-0 right-0 bg-blackest bg-opacity-80 text-offwhite rounded-md m-2 px-2 py-0.5 truncate">
-                      {nft.metadata.name}
-                    </h4>
-                  </Button>
-                ))
-              ) : (
-                <p className="col-span-2 text-center text-lightgrey">
-                  No NFTs found.
+                  {token.usd_value && token.usd_value_24hr_usd_change
+                    ? `-$${Math.abs(token.usd_value_24hr_usd_change).toFixed(2)}`
+                    : "$0.00"}
                 </p>
               )}
             </div>
-          </TabsContent>
-          <TabsContent
-            value="historyTab"
-            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
-              currentTab === "historyTab" ? fadeClass : "opacity-0"
-            }`}
-          >
-            <h2 className="text-center text-offwhite mb-2">Recent Activity</h2>
-            {fetching ? (
-              <Skeleton className="w-full py-8 mt-10 bg-char" />
-            ) : Object.keys(groupedHistorys).length > 0 ? (
-              <div className="flex flex-col items-center justify-center">
-                {Object.entries(groupedHistorys).map(([date, historyItems], index) => (
-                  <div key={index} className="w-full max-w-sm mb-1">
-                    <h4 className="text-left text-lightgrey mb-2">{date}</h4>
-                    {historyItems.map((history, historyIndex) => (
+          </Button>
+        ))}
+      </div>
+    ) : (
+      <p className="text-center text-lightgrey">No tokens found.</p>
+    )}
+    </>
+  );
+
+  const renderNftTab = () => (
+    <>
+    <div className="grid grid-cols-2 gap-2 mt-1 mb-4">
+    {fetching ? (
+      Array.from({ length: 8 }).map((_, index) => (
+        <Skeleton
+          key={index}
+          className="w-full rounded-md h-[156px] bg-blacker"
+        />
+      ))
+    ) : nfts.length > 0 ? (
+      nfts.map((nft, index) => (
+        <Button
+          key={index}
+          onClick={() => openModal("nft", nft)}
+          style={{ cursor: "pointer" }}
+          className="relative rounded-md w-full h-full overflow-hidden p-0 hover:bg-inherit bg-blacker shadow-blackest shadow-sm"
+        >
+          <img
+            src={nft.metadata.image}
+            alt={`nft-${index}`}
+            className="object-contain"
+          />
+          <h4 className="absolute bottom-0 left-0 right-0 bg-blackest bg-opacity-80 text-offwhite rounded-md m-2 px-2 py-0.5 truncate">
+            {nft.metadata.name}
+          </h4>
+        </Button>
+      ))
+    ) : (
+      <p className="col-span-2 text-center text-lightgrey">
+        No NFTs found.
+      </p>
+    )}
+  </div>
+  </>
+  );
+
+  const renderHistoryTab = () => (
+    <>
+      <h2 className="text-center text-offwhite mb-2">Recent Activity</h2>
+      {fetching ? (
+        <Skeleton className="w-full py-8 mt-10 bg-char" />
+      ) : Object.keys(groupedHistorys).length > 0 ? (
+        <div className="flex flex-col items-center justify-center">
+          {Object.entries(groupedHistorys).map(
+            ([date, historyItems], index) => (
+              <div key={index} className="w-full max-w-sm mb-1">
+                <h4 className="text-left text-lightgrey mb-2">{date}</h4>
+                {historyItems.map((history, historyIndex) => (
                   <Button
                     className="w-full h-16 p-2 px-4 mt-1 mb-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
                     key={historyIndex}
@@ -355,19 +343,65 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
                   </Button>
                 ))}
               </div>
-                ))}
-                </div>
-            ) : (
-              <p className="text-center text-lightgrey">No history found.</p>
-            )}
+            )
+          )}
+        </div>
+      ) : (
+        <p className="text-center text-lightgrey">No history found.</p>
+      )}
+    </>
+  );
+
+  const renderSwapTab = () => (
+  <>
+  Make token swaps in your account here.
+  </>
+  );
+
+  return (
+    <div className="content">
+      <Tabs
+        defaultValue="tokenTab"
+        value={currentTab}
+        className="w-[320px] rounded-none"
+      >
+        <div className="relative w-full h-[470px]">
+          <TabsContent
+            value="tokenTab"
+            aria-label="Tokens"
+            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
+              currentTab === "tokenTab" ? fadeClass : "opacity-0"
+            }`}
+          >
+            {renderTokenTab()}
+          </TabsContent>
+          <TabsContent
+            id="nftTab"
+            value="nftTab"
+            aria-label="NFTs"
+            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
+              currentTab === "nftTab" ? fadeClass : "opacity-0"
+            }`}
+          >
+            {renderNftTab()}
+          </TabsContent>
+          <TabsContent
+            value="historyTab"
+            aria-label="History"
+            className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
+              currentTab === "historyTab" ? fadeClass : "opacity-0"
+            }`}
+          >
+            {renderHistoryTab()}
           </TabsContent>
           <TabsContent
             value="swapTab"
+            aria-label="Swap"
             className={`absolute w-full h-full transition-opacity duration-50 ${
               currentTab === "swapTab" ? fadeClass : "opacity-0"
             }`}
           >
-            Make token swaps in your account here.
+            {renderSwapTab()}
           </TabsContent>
         </div>
         <TabsList className="z-10 fixed grid w-[320px] grid-cols-4 h-[64px] rounded-none bg-blacker focus:bg-blacker">
