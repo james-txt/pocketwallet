@@ -29,6 +29,13 @@ export const CHAINS_CONFIG = {
     symbol: 'MATIC',
     scanUrl: 'https://amoy.polygonscan.com/tx/',
   },  
+  '0x2105': {
+    hex: '0x2105',
+    name: 'Base Mainnet',
+    rpcUrl: `https://base-mainnet.infura.io/v3/${VITE_INFURA_PROJECT_ID}`,
+    symbol: 'BASE',
+    scanUrl: 'https://basescan.org/tx/',
+  },  
   '0xa86a': {
     hex: '0xa86a',
     name: 'Avalanche Mainnet',

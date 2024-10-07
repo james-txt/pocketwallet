@@ -5,7 +5,6 @@ import { MemoryRouter } from 'react-router-dom';
 import Home from '../src/components/Home';
 import '@testing-library/jest-dom';
 
-// Mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
@@ -15,7 +14,6 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock the logo import
 vi.mock('../src/assets/logo.png', () => ({
   default: 'mocked-logo-path',
 }));

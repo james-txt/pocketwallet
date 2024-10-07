@@ -6,7 +6,6 @@ import { Wallet } from 'ethers';
 import RecoverAccount from '../src/components/RecoverAccount';
 import '@testing-library/jest-dom';
 
-// Mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');

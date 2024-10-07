@@ -7,8 +7,6 @@ import '@testing-library/jest-dom';
 describe('Modal', () => {
   const mockOnClose = vi.fn();
   const testContent = 'Test Modal Content';
-  const closeIcon = screen.getByLabelText('close-icon');
-  const modalElement = screen.getByText(testContent).closest('.modal');
 
   it('renders nothing when isOpen is false', () => {
     render(
@@ -35,6 +33,7 @@ describe('Modal', () => {
         {testContent}
       </Modal>
     );
+    const modalElement = screen.getByText(testContent).closest('.modal');
     expect(modalElement).toHaveClass(animationClass);
   });
 
@@ -44,6 +43,7 @@ describe('Modal', () => {
         {testContent}
       </Modal>
     );
+    const closeIcon = screen.getByLabelText('close-icon');
     fireEvent.click(closeIcon);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
@@ -54,6 +54,7 @@ describe('Modal', () => {
         {testContent}
       </Modal>
     );
+    const closeIcon = screen.getByLabelText('close-icon');
     expect(closeIcon).toHaveClass('z-10 absolute top-4 left-4 h-6 w-6 text-lightgrey');
     expect(closeIcon).toHaveStyle('cursor: pointer');
   });
@@ -64,6 +65,7 @@ describe('Modal', () => {
         {testContent}
       </Modal>
     );
+    const modalElement = screen.getByText(testContent).closest('.modal');
     expect(modalElement).toHaveClass('fixed z-10 modal bg-blacker border-lightgrey border border-t-0');
   });
 });
