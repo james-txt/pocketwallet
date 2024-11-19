@@ -33,7 +33,7 @@ const groupHistoryByDate = (historys: Historys[]) => {
   }, {});
 };
 
-
+// ** Insert Local Testing Script Here ** //
 
 const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhrase }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -145,6 +145,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
           <Button
             className="w-full h-16 py-2 my-3 flex justify-between place-items-center rounded bg-chared font-normal text-offwhite hover:bg-char shadow-blackest shadow-sm"
             key={tokenIndex}
+            data-testid={`token-${token.symbol}`}
             onClick={() => openModal("token", token)}
           >
             <div className="flex gap-2 place-items-center">
@@ -376,7 +377,6 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
             {renderTokenTab()}
           </TabsContent>
           <TabsContent
-            id="nftTab"
             value="nftTab"
             aria-label="NFTs"
             className={`absolute w-full h-full scrollbar-hide overflow-y-scroll transition-opacity duration-50 ${
@@ -407,6 +407,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
         <TabsList className="z-10 fixed grid w-[320px] grid-cols-4 h-[64px] rounded-none bg-blacker focus:bg-blacker">
           <TabsTrigger
             value="tokenTab"
+            data-testid="token-tab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("tokenTab")}
           >
@@ -414,6 +415,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
           </TabsTrigger>
           <TabsTrigger
             value="nftTab"
+            data-testid="nft-tab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("nftTab")}
           >
@@ -421,6 +423,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
           </TabsTrigger>
           <TabsTrigger
             value="historyTab"
+            data-testid="history-tab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("historyTab")}
           >
@@ -428,6 +431,7 @@ const ViewWallet: React.FC<ViewWalletProps> = ({ wallet, selectedChain, seedPhra
           </TabsTrigger>
           <TabsTrigger
             value="swapTab"
+            data-testid="swap-tab"
             className="bg-blacker rounded-none text-base p-4 text-lightgrey hover:text-offwhite focus:bg-blacker outline-none border-t-2 border-t-transparent data-[state=active]:bg-blacker data-[state=active]:shadow-none data-[state=active]:text-sky data-[state=active]:border-sky data-[state=active]:border-t-2 transition-colors duration-50"
             onClick={() => handleTabChange("swapTab")}
           >

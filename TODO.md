@@ -18,12 +18,12 @@
     - [x] generate seedphrase, wallet mnemonic
     - [x] set seedphrase/wallet
     - [x] write tests
+- [x] Create modal comp
 - [x] ViewWallet tab
     - [x] setup navigation bar
     - [x] setup tab change
-    - [] write tests
-        - [x] Create modal comp
-        - [x] write tests
+    - [x] write tests
+    - [x] debug polygon amoy rpc url
 - [x] Token tab
     - [x] setup token ui
     - [x] display wallet total balance, price in usd
@@ -34,6 +34,7 @@
         - [x] fetch gas price fee for transaction
         - [x] send transaction via rpcURL, tokenContract
         - [x] fetch and display transaction receipt
+        - [x] optimize code
     - [ ] write tests
 - [x] Nft tab
     - [ ] write tests
