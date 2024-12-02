@@ -25,17 +25,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Add Vitest types */
-    "types": ["vitest"]
+    "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "src",
-    "tests",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "vitest.setup.ts"
-  ],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
