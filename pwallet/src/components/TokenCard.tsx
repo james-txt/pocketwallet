@@ -350,20 +350,22 @@ const TokenCard: React.FC<TokenCardProps> = React.memo(
               placeholder="Amount to send"
               type="number"
             />
-            {isFetchingGasPrice ? (
-              <Skeleton className="w-[320px] h-10 mt-4 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none" />
-            ) : (
-              <Card className="w-[320px] mt-4 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none">
-                <CardContent className="grid grid-cols-4 p-4 py-2 border-blacker">
-                  <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
-                    Estimated Fee:
-                  </CardTitle>
+
+            <Card className="w-[320px] mt-4 rounded-md bg-chared shadow-blackest shadow-sm text-offwhite text-left border-none">
+              <CardContent className="grid grid-cols-4 p-4 py-2 border-blacker">
+                <CardTitle className="col-span-2 text-base font-semibold text-lightgrey tracking-wide">
+                  Estimated Fee:
+                </CardTitle>{" "}
+                {isFetchingGasPrice ? (
+                  <Skeleton className="col-span-2 bg-transparent text-offwhite font-normal text-base text-right border-none" />
+                ) : (
                   <CardDescription className="col-span-2 font-normal text-base text-right text-offwhite truncate">
                     {gasPrice} {CHAINS_CONFIG[selectedChain].symbol}
                   </CardDescription>
-                </CardContent>
-              </Card>
-            )}
+                )}
+              </CardContent>
+            </Card>
+
             <DrawerFooter className="flex flex-row w-full gap-4 p-0 mt-4">
               <DrawerClose asChild>
                 <Button
