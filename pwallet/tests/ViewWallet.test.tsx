@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
@@ -13,7 +12,7 @@ vi.mock("../src/hooks/useFetchTokensAndNfts", () => ({
 }));
 
 // Mock the components that are not directly tested
-vi.mock("./Modal", () => ({ children }) => (
+vi.mock("./Modal", () => ({ children }: { children: React.ReactNode }) => (
   <div data-testid="modal">{children}</div>
 ));
 vi.mock("./NftCard", () => () => <div data-testid="nft-card">NftCard</div>);
